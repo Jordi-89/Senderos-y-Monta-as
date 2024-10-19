@@ -15,12 +15,22 @@ public class Inscripcion {
     }
 
     //Getters y Setters
-    public String getcodigoInscripcion() { return codigoInscripcion; }
-    public Socio getsocio() { return socio; }
+    public String getCodigoInscripcion() { return codigoInscripcion; }
+    public Socio getSocio() { return socio; }
     public Excursion getExcursion() { return excursion; }
-    public void setcodigoInscripcion(String codigoInscripcion) { this.codigoInscripcion = codigoInscripcion; }
-    public void setsocio(Socio socio) { this.socio = socio; }
-    public void setExcursion(Excursion excursion) { this.excursion = excursion; }
+    public void setCodigoInscripcion(String codigoInscripcion) { this.codigoInscripcion = codigoInscripcion; }
+    public void setSocio(Socio socio) {
+        if (socio == null) {
+            throw new IllegalArgumentException("El socio no puede ser nulo.");
+        }
+        this.socio = socio;
+    }
+    public void setExcursion(Excursion excursion) {
+        if (excursion == null) {
+            throw new IllegalArgumentException("La excursión no puede ser nula.");
+        }
+        this.excursion = excursion;
+    }
 
     //toString
     @Override

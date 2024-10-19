@@ -19,6 +19,15 @@ public class SocioEstandar extends Socio {
     public void setNif(String nif) { this.nif = nif; }
     public void setSeguro(Seguro seguro) { this.seguro = seguro; }
 
+    //Métodos
+    public double calcularCuotaMensual() {
+        return 10.0; // Cuota mensual estándar
+    }
+
+    public double calcularPrecioExcursion(Excursion excursion) {
+        return excursion.getPrecioExcursion() + seguro.getPrecioSeguro(); // Precio de la excursión más el seguro
+    }
+
     //toString
     @Override
     public String toString() {

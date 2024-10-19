@@ -1,148 +1,144 @@
 package javaEnjoyers.modelo;
 
 import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Clase que actúa como repositorio de los datos de la aplicación.
- */
 public class Datos {
-    // Listas para almacenar los datos de las entidades
-    private ArrayList<Socio> listaSocios;
-    private ArrayList<Excursion> listaExcursiones;
-    private ArrayList<Inscripcion> listaInscripciones;
 
-    // Constructor que inicializa las listas
+    // Listas de entidades gestionadas por la aplicación
+    private ArrayList<Socio> socios;
+    private ArrayList<Inscripcion> inscripciones;
+    private ArrayList<Excursion> excursiones;
+    private ArrayList<Seguro> seguros;
+    private ArrayList<Federacion> federaciones;
+
+    // Constructor que precarga algunos datos iniciales
     public Datos() {
-        listaSocios = new ArrayList<>();
-        listaExcursiones = new ArrayList<>();
-        listaInscripciones = new ArrayList<>();
+        socios = new ArrayList<>();
+        inscripciones = new ArrayList<>();
+        excursiones = new ArrayList<>();
+        seguros = precargarSeguros();
+        federaciones = precargarFederaciones();
     }
 
-    // Métodos de gestión para Socios
-
-    /**
-     * Añadir un socio a la lista de socios.
-     *
-     * @param socio El socio a añadir.
-     * @return true si se añadió correctamente, false si el socio ya existe.
-     */
-    public boolean añadirSocio(Socio socio) {
-        if (!listaSocios.contains(socio)) {
-            listaSocios.add(socio);
-            return true;
-        }
-        return false; // Si el socio ya existe, no se añade
+    // Getters y Setters
+    public ArrayList<Socio> getSocios() {
+        return socios;
     }
 
-    /**
-     * Eliminar un socio de la lista.
-     *
-     * @param numeroSocio El número del socio a eliminar.
-     * @return true si se eliminó correctamente, false si no se encontró el socio o tiene inscripciones.
-     */
-    public boolean eliminarSocio(int numeroSocio) {
-        Socio socio = buscarSocioPorNumero(numeroSocio);
-        if (socio != null && !tieneInscripciones(socio)) {
-            listaSocios.remove(socio);
-            return true;
-        }
-        return false;
+    public ArrayList<Inscripcion> getInscripciones() {
+        return inscripciones;
     }
 
-    /**
-     * Modificar el tipo de seguro de un socio estándar.
-     *
-     * @param numeroSocio El número del socio.
-     * @param nuevoTipoSeguro El nuevo tipo de seguro.
-     * @return true si se modificó correctamente, false si no se encontró el socio o no es estándar.
-     */
-    public boolean modificarSeguroSocio(int numeroSocio, String nuevoSeguro) {
-        Socio socio = buscarSocioPorNumero(numeroSocio);
-        if (socio instanceof SocioEstandar) {
-            ((SocioEstandar) socio).setSeguro(nuevoSeguro);
-            return true;
-        }
-        return false;
+    public ArrayList<Excursion> getExcursiones() {
+        return excursiones;
     }
 
-    /**
-     * Buscar un socio por su número.
-     *
-     * @param numeroSocio El número del socio.
-     * @return El socio encontrado o null si no existe.
-     */
-    public Socio buscarSocioPorNumero(int numeroSocio) {
-        for (Socio socio : listaSocios) {
-            if (socio.getNumeroSocio() == numeroSocio) {
+    public ArrayList<Seguro> getSeguros() {
+        return seguros;
+    }
+
+    public ArrayList<Federacion> getFederaciones() {
+        return federaciones;
+    }
+
+    // Precarga de seguros
+    private ArrayList<Seguro> precargarSeguros() {
+        ArrayList<Seguro> seguros = new ArrayList<>();
+        seguros.add(new Seguro(TipoSeguro.BASICO, 20.0));  // Ejemplo de seguro básico
+        seguros.add(new Seguro(TipoSeguro.COMPLETO, 50.0)); // Ejemplo de seguro completo
+        return seguros;
+    }
+
+    // Precarga de federaciones
+    private ArrayList<Federacion> precargarFederaciones() {
+        ArrayList<Federacion> federaciones = new ArrayList<>();
+        federaciones.add(new Federacion("FED01", "Federación de Montaña"));
+        federaciones.add(new Federacion("FED02", "Federación de Senderismo"));
+        return federaciones;
+    }
+
+    // Métodos para agregar nuevos socios, inscripciones y excursiones
+    public void agregarSocio(Socio socio) {
+        socios.add(socio);
+    }
+
+    public void agregarInscripcion(Inscripcion inscripcion) {
+        inscripciones.add(inscripcion);
+    }
+
+    public void agregarExcursion(Excursion excursion) {
+        excursiones.add(excursion);
+    }
+
+    // Métodos para eliminar socios, inscripciones y excursiones
+    public boolean eliminarSocio(Socio socio) {
+        return socios.remove(socio);  // Devuelve true si se elimina correctamente
+    }
+
+    public boolean eliminarInscripcion(Inscripcion inscripcion) {
+        return inscripciones.remove(inscripcion);
+    }
+
+    public boolean eliminarExcursion(Excursion excursion) {
+        return excursiones.remove(excursion);
+    }
+
+    // Métodos para buscar (ejemplos sencillos, se pueden mejorar)
+    public Socio buscarSocioPorNumero(String numeroSocio) {
+        for (Socio socio : socios) {
+            if (socio.getNumeroSocio().equals(numeroSocio)) {
                 return socio;
             }
         }
-        return null;
+        return null;  // Si no se encuentra el socio
     }
 
-    /**
-     * Verificar si un socio tiene inscripciones.
-     *
-     * @param socio El socio a verificar.
-     * @return true si el socio tiene inscripciones, false en caso contrario.
-     */
-    private boolean tieneInscripciones(Socio socio) {
-        for (Inscripcion inscripcion : listaInscripciones) {
-            if (inscripcion.getSocio().equals(socio)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Métodos de gestión para Excursiones
-
-    /**
-     * Añadir una excursión a la lista.
-     *
-     * @param excursion La excursión a añadir.
-     * @return true si se añadió correctamente, false si ya existe.
-     */
-    public boolean añadirExcursion(Excursion excursion) {
-        if (!listaExcursiones.contains(excursion)) {
-            listaExcursiones.add(excursion);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Eliminar una excursión de la lista.
-     *
-     * @param codigoExcursion El código de la excursión a eliminar.
-     * @return true si se eliminó correctamente, false si no se encontró o hay inscripciones asociadas.
-     */
-    public boolean eliminarExcursion(String codigoExcursion) {
-        Excursion excursion = buscarExcursionPorCodigo(codigoExcursion);
-        if (excursion != null && !tieneInscripciones(excursion)) {
-            listaExcursiones.remove(excursion);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Buscar una excursión por su código.
-     *
-     * @param codigoExcursion El código de la excursión.
-     * @return La excursión encontrada o null si no existe.
-     */
     public Excursion buscarExcursionPorCodigo(String codigoExcursion) {
-        for (Excursion excursion : listaExcursiones) {
-            if (excursion.getCodigo().equals(codigoExcursion)) {
+        for (Excursion excursion : excursiones) {
+            if (excursion.getCodigoExcursion().equals(codigoExcursion)) {
                 return excursion;
             }
         }
-        return null;
+        return null;  // Si no se encuentra la excursión
     }
 
-    // Métodos adicionales para gestionar inscripciones y otros datos
+    public Inscripcion buscarInscripcionPorCodigo(String codigoInscripcion) {
+        for (Inscripcion inscripcion : inscripciones) {
+            if (inscripcion.getCodigoInscripcion().equals(codigoInscripcion)) {
+                return inscripcion;
+            }
+        }
+        return null;  // Si no se encuentra la inscripción
+    }
 
-    // Implementar métodos similares para gestionar inscripciones
+    public ArrayList<Inscripcion> buscarInscripcionesPorSocio(String numeroSocio) {
+        ArrayList<Inscripcion> inscripcionesPorSocio = new ArrayList<>();
+
+        for (Inscripcion inscripcion : inscripciones) {
+            if (inscripcion.getSocio().getNumeroSocio().equals(numeroSocio)) {
+                inscripcionesPorSocio.add(inscripcion);
+            }
+        }
+        return inscripcionesPorSocio;
+    }
+
+    public ArrayList<Inscripcion> mostrarInscripcionesPorExcursion(String codigoExcursion) {
+        ArrayList<Inscripcion> resultado = new ArrayList<>();
+
+        for (Inscripcion inscripcion : inscripciones) {
+            if (inscripcion.getExcursion().getCodigoExcursion().equals(codigoExcursion)) {
+                resultado.add(inscripcion);
+            }
+        }
+        return resultado;
+    }
+
+    // toString
+    @Override
+    public String toString() {
+        return "Datos: " +
+                "\nSocios: " + socios +
+                "\nInscripciones: " + inscripciones +
+                "\nExcursiones: " + excursiones;
+    }
 }

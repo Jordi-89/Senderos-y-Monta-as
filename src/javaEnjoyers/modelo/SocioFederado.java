@@ -17,6 +17,15 @@ public class SocioFederado extends Socio {
     public String getNif() { return nif; }
     public Federacion getFederacion() { return federacion; }
 
+    //Métodos
+    public double calcularCuotaMensual() {
+        return 10.0 * 0.95; // Cuota mensual con un 5% de descuento
+    }
+
+    public double calcularPrecioExcursion(Excursion excursion) {
+        return excursion.getPrecioExcursion() * 0.90; // Precio de la excursión con un 10% de descuento
+    }
+
     //toString
     @Override
     public String toString() {

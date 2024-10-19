@@ -13,10 +13,15 @@ public abstract class Socio {
     }
 
     //Getters y Setters
-    public String getnumeroSocio() { return numeroSocio; }
+    public String getNumeroSocio() { return numeroSocio; }
     public String getNombre() { return nombre; }
-    public void setnumeroSocio(String numeroSocio) { this.numeroSocio = numeroSocio; }
+    public void setNumeroSocio(String numeroSocio) { this.numeroSocio = numeroSocio; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+
+    //Métodos
+    public double calcularCuotaMensual() {
+        return 10.0;  // Cuota mensual fija de 10€
+    }
 
     //toString
     @Override

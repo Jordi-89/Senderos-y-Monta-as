@@ -13,10 +13,20 @@ public class Federacion {
     }
 
     //Getters y Setters
-    public String getcodigoFederacion() { return codigoFederacion; }
+    public String getCodigoFederacion() { return codigoFederacion; }
     public String getNombre() { return nombre; }
-    public void setcodigoFederacion(String codigoFederacion) { this.codigoFederacion = codigoFederacion; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setCodigoFederacion(String codigoFederacion) {
+        if (codigoFederacion == null || codigoFederacion.trim().isEmpty()) {
+            throw new IllegalArgumentException("El código de federación no puede estar vacío.");
+        }
+        this.codigoFederacion = codigoFederacion;
+    }
+    public void setNombre(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre de la federación no puede estar vacío.");
+        }
+        this.nombre = nombre;
+    }
 
     //toString
     @Override
