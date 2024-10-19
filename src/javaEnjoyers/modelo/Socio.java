@@ -1,11 +1,13 @@
-public abstract class socio {
+package javaEnjoyers.modelo;
+
+public abstract class Socio {
 
     //Atributos
     private String numeroSocio;
     private String nombre;
 
     //Constructor
-    public socio(String numeroSocio, String nombre){
+    public Socio(String numeroSocio, String nombre){
         this.numeroSocio = numeroSocio;
         this.nombre = nombre;
     }
@@ -20,7 +22,7 @@ public abstract class socio {
     @Override
     public String toString() {
         return "Socio: " +
-                "\nNúmero de socio: " + numeroSocio +
+                "\nNúmero de javaEnjoyers.modulo.socio: " + numeroSocio +
                 "\nNombre: " + nombre;
     }
 }

@@ -1,11 +1,13 @@
-public class socioFederado extends socio {
+package javaEnjoyers.modelo;
+
+public class SocioFederado extends Socio {
 
     //Atributos
     public String nif;
-    public federacion federacion;
+    public Federacion federacion;
 
     //Constructor
-    public socioFederado(String numeroSocio, String nombre, String nif, federacion federacion){
+    public SocioFederado(String numeroSocio, String nombre, String nif, Federacion federacion){
         super(numeroSocio, nombre);
         this.nif = nif;
         this.federacion = federacion;
@@ -13,7 +15,7 @@ public class socioFederado extends socio {
 
     //Getters y Setters
     public String getNif() { return nif; }
-    public federacion getFederacion() { return federacion; }
+    public Federacion getFederacion() { return federacion; }
 
     //toString
     @Override

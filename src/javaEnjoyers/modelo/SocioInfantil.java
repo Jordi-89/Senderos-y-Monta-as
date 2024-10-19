@@ -1,10 +1,12 @@
-public class socioInfantil extends socio {
+package javaEnjoyers.modelo;
+
+public class SocioInfantil extends Socio {
 
     //Atributos
     private String numeroSocioAdulto;
 
     //Constructor
-    public socioInfantil(String numeroSocio, String nombre){
+    public SocioInfantil(String numeroSocio, String nombre){
         super(numeroSocio, nombre);
         this.numeroSocioAdulto = numeroSocioAdulto;
     }

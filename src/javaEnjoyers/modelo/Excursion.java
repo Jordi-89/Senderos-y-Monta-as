@@ -1,6 +1,8 @@
+package javaEnjoyers.modelo;
+
 import java.time.LocalDate;
 
-public class excursion {
+public class Excursion {
 
     //Atributos
     private String codigoExcursion;
@@ -10,7 +12,7 @@ public class excursion {
     private double precioExcursion;
 
     //Constructor
-    public excursion(String codigoExcursion, String descripcion, LocalDate fecha, int numeroDias, double precio){
+    public Excursion(String codigoExcursion, String descripcion, LocalDate fecha, int numeroDias, double precio){
         this.codigoExcursion = codigoExcursion;
         this.descripcion = descripcion;
         this.fecha = fecha;

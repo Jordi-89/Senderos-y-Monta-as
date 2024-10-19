@@ -1,11 +1,13 @@
-public class federacion {
+package javaEnjoyers.modelo;
+
+public class Federacion {
 
     //Atributos
     private String codigoFederacion;
     private String nombre;
 
     //Constructor
-    public federacion(String codigoFederacion, String nombre){
+    public Federacion(String codigoFederacion, String nombre){
         this.codigoFederacion = codigoFederacion;
         this.nombre = nombre;
     }

@@ -1,19 +1,21 @@
-public class seguro {
+package javaEnjoyers.modelo;
+
+public class Seguro {
 
     //Atributos
-    public tipoSeguro tipoSeguro;
+    public TipoSeguro tipoSeguro;
     public double precioSeguro;
 
     //Constructor
-    public seguro(tipoSeguro tipoSeguro, double precio){
+    public Seguro(TipoSeguro tipoSeguro, double precio){
         this.tipoSeguro = tipoSeguro;
         this.precioSeguro = precio;
     }
 
     //Getters y Setters
-    public tipoSeguro getTipoSeguro() { return tipoSeguro; }
+    public TipoSeguro getTipoSeguro() { return tipoSeguro; }
     public double getPrecioSeguro() { return precioSeguro; }
-    public void setTipoSeguro(tipoSeguro tipoSeguro) { this.tipoSeguro = tipoSeguro; }
+    public void setTipoSeguro(TipoSeguro tipoSeguro) { this.tipoSeguro = tipoSeguro; }
     public void setPrecioSeguro(double precio) { this.precioSeguro = precio; }
 
     //toString
