@@ -16,15 +16,29 @@ public class SocioInfantil extends Socio {
     public void setNumeroSocioAdulto(String numeroSocioAdulto) { this.numeroSocioAdulto = numeroSocioAdulto; }
 
     //Métodos
+    @Override
     public double calcularCuotaMensual() {
-        double cuotaMensual = 10.0 * 0.50;  // Cuota base con un 50% de descuento
+        double cuotaBase = 10.0 * 0.50;  // Cuota base con 50% de descuento
+        double totalExcursiones = 0.0;
 
-        // Sumar el costo de cada excursión (sin seguro)
+        // Calcular el costo total de las excursiones (sin descuentos adicionales)
         for (Inscripcion inscripcion : this.getInscripciones()) {
-            cuotaMensual += inscripcion.getExcursion().getPrecioExcursion();
+            totalExcursiones += inscripcion.getExcursion().getPrecioExcursion();
         }
-        return cuotaMensual;
+
+        // Desglose de los componentes de la factura
+        System.out.println("Desglose de la factura mensual (Socio Infantil):");
+        System.out.println("Cuota base con descuento (50%): " + cuotaBase + " €");
+        System.out.println("Costo de excursiones: " + totalExcursiones + " €");
+        System.out.println("Seguro: Cubierto por el padre o madre");
+
+        // Calcular el total
+        double total = cuotaBase + totalExcursiones;
+        System.out.println("Total a pagar: " + total + " €");
+
+        return total;
     }
+
 
     public double calcularPrecioExcursion(Excursion excursion) {
         return excursion.getPrecioExcursion(); // Los socios infantiles no tienen cargos adicionales
@@ -34,6 +48,8 @@ public class SocioInfantil extends Socio {
     @Override
     public String toString() {
         return "SocioInfantil: " +
+                "\nNumero socio: " + getNumeroSocio() +
+                "\nNombre: " + getNombre() +
                 "\nNúmero Socio Adulto: " + numeroSocioAdulto;
     }
 }

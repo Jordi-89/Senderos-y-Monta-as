@@ -26,16 +26,26 @@ public class SocioEstandar extends Socio {
 
     @Override
     public double calcularCuotaMensual() {
-        double cuotaMensual = 10.0;  // Cuota base
+        double cuotaBase = 10.0;  // Cuota base
+        double costoSeguro = this.getSeguro().getPrecioSeguro();  // Precio del seguro
+        double totalExcursiones = 0.0;
 
-        // Sumar el precio del seguro (se paga siempre, independientemente de las excursiones)
-        cuotaMensual += this.getSeguro().getPrecioSeguro();
-
-        // Sumar el costo de cada excursión (si las hay)
+        // Calcular el costo total de las excursiones
         for (Inscripcion inscripcion : this.getInscripciones()) {
-            cuotaMensual += inscripcion.getExcursion().getPrecioExcursion();
+            totalExcursiones += inscripcion.getExcursion().getPrecioExcursion();
         }
-        return cuotaMensual;
+
+        // Desglose de los componentes de la factura
+        System.out.println("Desglose de la factura mensual:");
+        System.out.println("Cuota base: " + cuotaBase + " €");
+        System.out.println("Costo del seguro: " + costoSeguro + " €");
+        System.out.println("Costo de excursiones: " + totalExcursiones + " €");
+
+        // Calcular y retornar el total
+        double total = cuotaBase + costoSeguro + totalExcursiones;
+        System.out.println("Total a pagar: " + total + " €");
+
+        return total;
     }
 
 
@@ -44,6 +54,8 @@ public class SocioEstandar extends Socio {
     @Override
     public String toString() {
         return "Socio Estándar: " +
+                "\nNumero socio: " + getNumeroSocio() +
+                "\nNombre: " + getNombre() +
                 "\nNIF: " + nif +
                 "\nTipo Seguro: " + seguro;
     }
