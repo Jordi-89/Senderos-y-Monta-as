@@ -11,6 +11,8 @@ import javaEnjoyers.modelo.Excursion;
 import javaEnjoyers.modelo.Inscripcion;
 import javaEnjoyers.modelo.Seguro;
 import javaEnjoyers.modelo.Federacion;
+import javaEnjoyers.modelo.excepciones.InscripcionNoEliminableException;
+import javaEnjoyers.modelo.excepciones.SocioNoEncontradoException;
 
 public class Controlador {
 
@@ -109,24 +111,22 @@ public class Controlador {
     }
 
     // 12. Eliminar inscripción
-    public boolean eliminarInscripcion(String codigoInscripcion) {
-        // Buscar la inscripción por su código
+    public void eliminarInscripcion(String codigoInscripcion) throws InscripcionNoEliminableException {
         Inscripcion inscripcion = datos.buscarInscripcionPorCodigo(codigoInscripcion);
 
         if (inscripcion != null) {
-            // Obtener la fecha de la excursión asociada a la inscripción
             LocalDate fechaExcursion = inscripcion.getExcursion().getFecha();
 
-            // Comprobar si la fecha actual es anterior a la fecha de la excursión
-            if (LocalDate.now().isBefore(fechaExcursion)) {
-                return datos.eliminarInscripcion(inscripcion);  // Eliminar inscripción si la fecha actual es anterior a la fecha de la excursión
+            // Verificar si la fecha de la excursión ya pasó
+            if (LocalDate.now().isAfter(fechaExcursion)) {
+                throw new InscripcionNoEliminableException("Error: No se puede eliminar la inscripción porque la fecha de la excursión ya pasó.");
             } else {
-                System.out.println("No se puede eliminar la inscripción. La fecha de la excursión ya ha pasado.");
-                return false;  // No se puede eliminar si la fecha de la excursión ya pasó
+                datos.eliminarInscripcion(inscripcion);
+                System.out.println("Inscripción eliminada correctamente.");
             }
+        } else {
+            throw new InscripcionNoEliminableException("Error: Inscripción no encontrada.");
         }
-        System.out.println("Inscripción no encontrada.");
-        return false;  // Si no se encuentra la inscripción
     }
 
     // 13. Eliminar excursión
@@ -157,15 +157,20 @@ public class Controlador {
 
     // 15. Filtrar excursiones por fecha
     public ArrayList<Excursion> filtrarExcursionesPorFecha(LocalDate fechaInicio, LocalDate fechaFin) {
-        ArrayList<Excursion> excursiones = datos.getExcursiones();
         ArrayList<Excursion> resultado = new ArrayList<>();
 
+        // Obtener todas las excursiones del sistema
+        ArrayList<Excursion> excursiones = datos.getExcursiones();
+
+        // Filtrar excursiones por rango de fechas
         for (Excursion excursion : excursiones) {
-            if (!excursion.getFecha().isBefore(fechaInicio) && !excursion.getFecha().isAfter(fechaFin)) {
+            LocalDate fechaExcursion = excursion.getFecha();
+            if ((fechaExcursion.isEqual(fechaInicio) || fechaExcursion.isAfter(fechaInicio)) &&
+                    (fechaExcursion.isEqual(fechaFin) || fechaExcursion.isBefore(fechaFin))) {
                 resultado.add(excursion);
             }
         }
-        return resultado;
+        return resultado;  // Retornar la lista de excursiones dentro del rango de fechas
     }
 
     // 16. Mostrar federaciones
@@ -174,8 +179,12 @@ public class Controlador {
     }
 
     // 17. Buscar socio por número
-    public Socio buscarSocioPorNumero(String numeroSocio) {
-        return datos.buscarSocioPorNumero(numeroSocio); // Llamada al metodo en Datos
+    public Socio buscarSocioPorNumero(String numeroSocio) throws SocioNoEncontradoException {
+        Socio socio = datos.buscarSocioPorNumero(numeroSocio);
+        if (socio == null) {
+            throw new SocioNoEncontradoException("Error: Socio con número " + numeroSocio + " no encontrado.");
+        }
+        return socio;
     }
 
     // 18. Buscar excursión por código

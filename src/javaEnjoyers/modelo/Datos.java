@@ -59,10 +59,11 @@ public class Datos {
         // Socios Federados
         SocioFederado socio3 = new SocioFederado("SOC003", "Carlos Martínez", "54321678C", federaciones.get(0));
         SocioFederado socio4 = new SocioFederado("SOC004", "Lucía Fernández", "43218765D", federaciones.get(1));
+        SocioFederado socio5 = new SocioFederado("SOC005", "Jordi Cañadillas", "47175802L", federaciones.get(1));
 
         // Socios Infantiles
-        SocioInfantil socio5 = new SocioInfantil("SOC005", "Luis Gutiérrez", "SOC001");
-        SocioInfantil socio6 = new SocioInfantil("SOC006", "Laura Rodríguez", "SOC003");
+        SocioInfantil socio6 = new SocioInfantil("SOC006", "Luis Gutiérrez", "SOC001");
+        SocioInfantil socio7 = new SocioInfantil("SOC007", "Laura Rodríguez", "SOC003");
 
         // Agregar socios a la lista
         socios.add(socio1);
@@ -71,31 +72,37 @@ public class Datos {
         socios.add(socio4);
         socios.add(socio5);
         socios.add(socio6);
+        socios.add(socio7);
 
         // Precargar excursiones (3 excursiones)
         Excursion excursion1 = new Excursion("EXC001", "Excursión a la Montaña", LocalDate.of(2024, 11, 15), 2, 100.0);
         Excursion excursion2 = new Excursion("EXC002", "Senderismo por el Bosque", LocalDate.of(2024, 12, 1), 1, 50.0);
         Excursion excursion3 = new Excursion("EXC003", "Excursión a la Playa", LocalDate.of(2024, 11, 20), 3, 150.0);
+        Excursion excursion4 = new Excursion("EXC004", "Excursión a la Montaña Vieja", LocalDate.of(2022, 5, 10), 1, 80.0);
 
         // Agregar excursiones a la lista
         excursiones.add(excursion1);
         excursiones.add(excursion2);
         excursiones.add(excursion3);
+        excursiones.add(excursion4);
 
         // Precargar inscripciones (3 inscripciones)
         Inscripcion inscripcion1 = new Inscripcion("INS001", socio1, excursion1); // Juan Pérez en Excursión a la Montaña
         Inscripcion inscripcion2 = new Inscripcion("INS002", socio3, excursion2); // Carlos Martínez en Senderismo por el Bosque
-        Inscripcion inscripcion3 = new Inscripcion("INS003", socio5, excursion3); // Luis Gutiérrez (infantil) en Excursión a la Playa
+        Inscripcion inscripcion3 = new Inscripcion("INS006", socio6, excursion3); // Luis Gutiérrez (infantil) en Excursión a la Playa
+        Inscripcion inscripcion4 = new Inscripcion("INS004", socio5, excursion4); // Jordi Cañadillas en Excursión a la Montaña Vieja
 
         // Agregar inscripciones a la lista
         inscripciones.add(inscripcion1);
         inscripciones.add(inscripcion2);
         inscripciones.add(inscripcion3);
+        inscripciones.add(inscripcion4);
 
         // Actualizar las listas de inscripciones de los socios
         socio1.agregarInscripcionSocios(inscripcion1);
         socio3.agregarInscripcionSocios(inscripcion2);
-        socio5.agregarInscripcionSocios(inscripcion3);
+        socio6.agregarInscripcionSocios(inscripcion3);
+        socio5.agregarInscripcionSocios(inscripcion4);
     }
 
     // Métodos para agregar nuevos socios, inscripciones y excursiones

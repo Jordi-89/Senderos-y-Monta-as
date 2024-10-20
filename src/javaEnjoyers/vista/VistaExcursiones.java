@@ -5,6 +5,7 @@ import javaEnjoyers.modelo.Excursion;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -94,22 +95,31 @@ public class VistaExcursiones {
     }
 
     private void filtrarExcursionesPorFecha() {
-        System.out.print("Fecha inicio (dd/MM/yyyy): ");
-        String fechaInicioStr = scanner.nextLine();
-        LocalDate fechaInicio = LocalDate.parse(fechaInicioStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        try {
+            // Pedir al usuario que ingrese las fechas
+            System.out.println("Ingrese la fecha de inicio (dd/MM/yyyy): ");
+            String fechaInicioStr = scanner.nextLine();
+            LocalDate fechaInicio = LocalDate.parse(fechaInicioStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        System.out.print("Fecha fin (dd/MM/yyyy): ");
-        String fechaFinStr = scanner.nextLine();
-        LocalDate fechaFin = LocalDate.parse(fechaFinStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            System.out.println("Ingrese la fecha de fin (dd/MM/yyyy): ");
+            String fechaFinStr = scanner.nextLine();
+            LocalDate fechaFin = LocalDate.parse(fechaFinStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        ArrayList<Excursion> excursionesFiltradas = controlador.filtrarExcursionesPorFecha(fechaInicio, fechaFin);
-        if (excursionesFiltradas.isEmpty()) {
-            System.out.println("No hay excursiones en el rango de fechas especificado.");
-        } else {
-            System.out.println("Excursiones en el rango de fechas:");
-            for (Excursion excursion : excursionesFiltradas) {
-                System.out.println(excursion.toString());
+            // Llamar al controlador para obtener las excursiones en ese rango de fechas
+            ArrayList<Excursion> excursionesFiltradas = controlador.filtrarExcursionesPorFecha(fechaInicio, fechaFin);
+
+            // Mostrar los resultados
+            if (excursionesFiltradas.isEmpty()) {
+                System.out.println("No se encontraron excursiones en el rango de fechas indicado.");
+            } else {
+                System.out.println("Excursiones entre " + fechaInicio + " y " + fechaFin + ":");
+                for (Excursion excursion : excursionesFiltradas) {
+                    System.out.println(excursion.toString());
+                }
             }
+        } catch (DateTimeParseException e) {
+            // Capturar el error si el formato de fecha es incorrecto
+            System.out.println("Error: Formato de fecha incorrecto. Use el formato dd/MM/yyyy.");
         }
     }
 }
