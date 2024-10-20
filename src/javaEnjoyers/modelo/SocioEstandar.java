@@ -28,12 +28,16 @@ public class SocioEstandar extends Socio {
     public double calcularCuotaMensual() {
         double cuotaMensual = 10.0;  // Cuota base
 
-        // Sumar el costo de cada excursión más el seguro
+        // Sumar el precio del seguro (se paga siempre, independientemente de las excursiones)
+        cuotaMensual += this.getSeguro().getPrecioSeguro();
+
+        // Sumar el costo de cada excursión (si las hay)
         for (Inscripcion inscripcion : this.getInscripciones()) {
-            cuotaMensual += inscripcion.getExcursion().getPrecioExcursion() + this.getSeguro().getPrecioSeguro();
+            cuotaMensual += inscripcion.getExcursion().getPrecioExcursion();
         }
         return cuotaMensual;
     }
+
 
 
     //toString

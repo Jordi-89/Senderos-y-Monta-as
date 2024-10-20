@@ -66,18 +66,31 @@ public class VistaInscripciones {
         System.out.print("Código de inscripción: ");
         String codigoInscripcion = scanner.nextLine();
 
+        // Verificar si el código de la inscripción ya existe
+        try {
+            Inscripcion inscripcionExistente = controlador.buscarInscripcionPorCodigo(codigoInscripcion);
+            if (inscripcionExistente != null) {
+                System.out.println("Error: Ya existe una inscripción con el código " + codigoInscripcion + ". No se puede agregar una inscripción con el mismo código.");
+                return;
+            }
+        } catch (Exception e) {
+            // Continuar si no existe la inscripción (este es el comportamiento esperado)
+        }
+
+        // Pedir el número de socio
         System.out.print("Número de Socio: ");
         String numeroSocio = scanner.nextLine();
 
         Socio socio;
         try {
-            socio = controlador.buscarSocioPorNumero(numeroSocio);  // Aquí manejamos la excepción
+            socio = controlador.buscarSocioPorNumero(numeroSocio);  // Verificar si el socio existe
         } catch (SocioNoEncontradoException e) {
             System.out.println(e.getMessage());  // Mostrar el mensaje de la excepción
             System.out.println("El socio no existe. Vamos a registrarlo.");
-            socio = agregarNuevoSocio(numeroSocio);  // Llamar a un metodo para agregar nuevo socio
+            socio = agregarNuevoSocio(numeroSocio);  // Llamar al método para agregar un nuevo socio
         }
 
+        // Pedir el código de la excursión
         System.out.print("Código de la Excursión: ");
         String codigoExcursion = scanner.nextLine();
         Excursion excursion = controlador.buscarExcursionPorCodigo(codigoExcursion);
@@ -86,9 +99,11 @@ public class VistaInscripciones {
             return;
         }
 
+        // Llamar al controlador para agregar la inscripción
         controlador.agregarInscripcion(codigoInscripcion, numeroSocio, codigoExcursion);
         System.out.println("Inscripción añadida correctamente.");
     }
+
 
     private Socio agregarNuevoSocio(String numeroSocio) {
         System.out.print("Nombre del Socio: ");

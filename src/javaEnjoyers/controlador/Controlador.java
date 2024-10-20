@@ -192,7 +192,12 @@ public class Controlador {
         return datos.buscarExcursionPorCodigo(codigoExcursion);
     }
 
-    // 17. Calcular Factura Mensual
+    // 19. Buscar inscripción por código
+    public Inscripcion buscarInscripcionPorCodigo(String codigoInscripcion) {
+        return datos.buscarInscripcionPorCodigo(codigoInscripcion);
+    }
+
+    // 20. Calcular Factura Mensual
     public double calcularFacturaMensual(String numeroSocio) {
         Socio socio = datos.buscarSocioPorNumero(numeroSocio);
         if (socio == null) {
@@ -201,7 +206,7 @@ public class Controlador {
         return socio.calcularCuotaMensual();  // Llama al metodo en el modelo
     }
 
-    // 18. Agregar inscripciones de cada socio
+    // 21. Agregar inscripciones de cada socio
     public void agregarInscripcionSocios(String codigoInscripcion, String numeroSocio, String codigoExcursion) {
         Socio socio = datos.buscarSocioPorNumero(numeroSocio);
         Excursion excursion = datos.buscarExcursionPorCodigo(codigoExcursion);
@@ -215,12 +220,12 @@ public class Controlador {
         }
     }
 
-    // 19. Agregar nuevos socios
+    // 22. Agregar nuevos socios
     public void agregarSocio(Socio nuevoSocio) {
         datos.agregarSocio(nuevoSocio);  // Agregar el nuevo socio a la lista de socios en Datos
     }
 
-    // 20. Mostras inscripciones por fecha
+    // 23. Mostras inscripciones por fecha
     public ArrayList<Inscripcion> mostrarInscripcionesPorFecha(LocalDate fechaInicio, LocalDate fechaFin) {
         ArrayList<Inscripcion> resultado = new ArrayList<>();
 

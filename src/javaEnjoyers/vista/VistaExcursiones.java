@@ -55,6 +55,19 @@ public class VistaExcursiones {
     private void agregarExcursion() {
         System.out.print("Código de la excursión: ");
         String codigo = scanner.nextLine();
+
+        // Verificar si el código de la excursión ya existe
+        try {
+            Excursion excursionExistente = controlador.buscarExcursionPorCodigo(codigo);
+            if (excursionExistente != null) {
+                System.out.println("Error: Ya existe una excursión con el código " + codigo + ". No se puede agregar una excursión con el mismo código.");
+                return;
+            }
+        } catch (Exception e) {
+            // Continuar si no existe la excursión (este es el comportamiento esperado)
+        }
+
+        // Pedir los demás datos de la excursión
         System.out.print("Descripción: ");
         String descripcion = scanner.nextLine();
         System.out.print("Fecha (dd/MM/yyyy): ");
@@ -66,9 +79,11 @@ public class VistaExcursiones {
         double precio = scanner.nextDouble();
         scanner.nextLine(); // Limpiar buffer
 
+        // Llamar al controlador para agregar la excursión
         controlador.agregarExcursion(codigo, descripcion, fecha, numeroDias, precio);
         System.out.println("Excursión añadida correctamente.");
     }
+
 
     private void eliminarExcursion() {
         System.out.print("Código de la excursión a eliminar: ");
