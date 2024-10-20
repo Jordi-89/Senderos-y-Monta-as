@@ -18,13 +18,23 @@ public class SocioFederado extends Socio {
     public Federacion getFederacion() { return federacion; }
 
     //Métodos
-    public double calcularCuotaMensual() {
-        return 10.0 * 0.95; // Cuota mensual con un 5% de descuento
-    }
 
     public double calcularPrecioExcursion(Excursion excursion) {
         return excursion.getPrecioExcursion() * 0.90; // Precio de la excursión con un 10% de descuento
     }
+
+    @Override
+    public double calcularCuotaMensual() {
+        double cuotaMensual = 10.0 * 0.95;  // Cuota base con un descuento del 5%
+
+        // Sumar el costo de cada excursión con un 10% de descuento
+        for (Inscripcion inscripcion : this.getInscripciones()) {
+            cuotaMensual += inscripcion.getExcursion().getPrecioExcursion() * 0.90;
+        }
+        return cuotaMensual;
+    }
+
+
 
     //toString
     @Override

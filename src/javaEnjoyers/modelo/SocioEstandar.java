@@ -20,13 +20,21 @@ public class SocioEstandar extends Socio {
     public void setSeguro(Seguro seguro) { this.seguro = seguro; }
 
     //Métodos
-    public double calcularCuotaMensual() {
-        return 10.0; // Cuota mensual estándar
-    }
-
     public double calcularPrecioExcursion(Excursion excursion) {
         return excursion.getPrecioExcursion() + seguro.getPrecioSeguro(); // Precio de la excursión más el seguro
     }
+
+    @Override
+    public double calcularCuotaMensual() {
+        double cuotaMensual = 10.0;  // Cuota base
+
+        // Sumar el costo de cada excursión más el seguro
+        for (Inscripcion inscripcion : this.getInscripciones()) {
+            cuotaMensual += inscripcion.getExcursion().getPrecioExcursion() + this.getSeguro().getPrecioSeguro();
+        }
+        return cuotaMensual;
+    }
+
 
     //toString
     @Override

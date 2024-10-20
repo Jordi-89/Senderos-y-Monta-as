@@ -110,14 +110,23 @@ public class Controlador {
 
     // 12. Eliminar inscripción
     public boolean eliminarInscripcion(String codigoInscripcion) {
+        // Buscar la inscripción por su código
         Inscripcion inscripcion = datos.buscarInscripcionPorCodigo(codigoInscripcion);
 
         if (inscripcion != null) {
-            return datos.eliminarInscripcion(inscripcion);
-        } else {
-            System.out.println("La inscripción no existe.");
-            return false;
+            // Obtener la fecha de la excursión asociada a la inscripción
+            LocalDate fechaExcursion = inscripcion.getExcursion().getFecha();
+
+            // Comprobar si la fecha actual es anterior a la fecha de la excursión
+            if (LocalDate.now().isBefore(fechaExcursion)) {
+                return datos.eliminarInscripcion(inscripcion);  // Eliminar inscripción si la fecha actual es anterior a la fecha de la excursión
+            } else {
+                System.out.println("No se puede eliminar la inscripción. La fecha de la excursión ya ha pasado.");
+                return false;  // No se puede eliminar si la fecha de la excursión ya pasó
+            }
         }
+        System.out.println("Inscripción no encontrada.");
+        return false;  // Si no se encuentra la inscripción
     }
 
     // 13. Eliminar excursión
@@ -174,12 +183,50 @@ public class Controlador {
         return datos.buscarExcursionPorCodigo(codigoExcursion);
     }
 
+    // 17. Calcular Factura Mensual
+    public double calcularFacturaMensual(String numeroSocio) {
+        Socio socio = datos.buscarSocioPorNumero(numeroSocio);
+        if (socio == null) {
+            return -1; // Indica que el socio no existe
+        }
+        return socio.calcularCuotaMensual();  // Llama al metodo en el modelo
+    }
 
+    // 18. Agregar inscripciones de cada socio
+    public void agregarInscripcionSocios(String codigoInscripcion, String numeroSocio, String codigoExcursion) {
+        Socio socio = datos.buscarSocioPorNumero(numeroSocio);
+        Excursion excursion = datos.buscarExcursionPorCodigo(codigoExcursion);
 
+        if (socio != null && excursion != null) {
+            Inscripcion nuevaInscripcion = new Inscripcion(codigoInscripcion, socio, excursion);
+            datos.agregarInscripcion(nuevaInscripcion);  // Agregar a la lista global de inscripciones
+            socio.agregarInscripcionSocios(nuevaInscripcion);  // Agregar a la lista de inscripciones del socio
+        } else {
+            System.out.println("Error: El socio o la excursión no existe.");
+        }
+    }
 
+    // 19. Agregar nuevos socios
+    public void agregarSocio(Socio nuevoSocio) {
+        datos.agregarSocio(nuevoSocio);  // Agregar el nuevo socio a la lista de socios en Datos
+    }
 
-    // Otros métodos que podrías necesitar:
-    // - Eliminar socio, inscripción, excursión
-    // - Modificar un seguro de un socio estándar
-    // - Filtrar excursiones por fecha
+    // 20. Mostras inscripciones por fecha
+    public ArrayList<Inscripcion> mostrarInscripcionesPorFecha(LocalDate fechaInicio, LocalDate fechaFin) {
+        ArrayList<Inscripcion> resultado = new ArrayList<>();
+
+        // Obtener todas las inscripciones
+        ArrayList<Inscripcion> inscripciones = datos.getInscripciones();
+
+        // Filtrar por rango de fechas
+        for (Inscripcion inscripcion : inscripciones) {
+            LocalDate fechaExcursion = inscripcion.getExcursion().getFecha();
+            if ((fechaExcursion.isEqual(fechaInicio) || fechaExcursion.isAfter(fechaInicio)) &&
+                    (fechaExcursion.isEqual(fechaFin) || fechaExcursion.isBefore(fechaFin))) {
+                resultado.add(inscripcion);
+            }
+        }
+        return resultado;  // Retornar las inscripciones que están dentro del rango de fechas
+    }
+
 }

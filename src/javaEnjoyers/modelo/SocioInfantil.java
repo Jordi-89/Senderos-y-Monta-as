@@ -17,7 +17,13 @@ public class SocioInfantil extends Socio {
 
     //Métodos
     public double calcularCuotaMensual() {
-        return 10.0 * 0.50; // Cuota mensual con un 50% de descuento
+        double cuotaMensual = 10.0 * 0.50;  // Cuota base con un 50% de descuento
+
+        // Sumar el costo de cada excursión (sin seguro)
+        for (Inscripcion inscripcion : this.getInscripciones()) {
+            cuotaMensual += inscripcion.getExcursion().getPrecioExcursion();
+        }
+        return cuotaMensual;
     }
 
     public double calcularPrecioExcursion(Excursion excursion) {
