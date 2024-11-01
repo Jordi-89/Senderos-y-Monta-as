@@ -5,6 +5,7 @@ import javaEnjoyers.modelo.Excursion;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -21,7 +22,9 @@ public class VistaExcursiones {
     public void mostrarMenuExcursiones() {
         int opcion;
         do {
-            System.out.println("Menú de Excursiones");
+            System.out.println("-------------------------------------------------");
+            System.out.println("              Menú de Excursiones             ");
+            System.out.println("-------------------------------------------------");
             System.out.println("1. Añadir Excursión");
             System.out.println("2. Eliminar Excursión");
             System.out.println("3. Mostrar todas las excursiones");
@@ -31,15 +34,19 @@ public class VistaExcursiones {
             scanner.nextLine(); // Limpiar buffer
             switch (opcion) {
                 case 1:
+                    System.out.println("\n| AÑADIR EXCURSIÓN\n");
                     agregarExcursion();
                     break;
                 case 2:
+                    System.out.println("\n| ELIMINAR EXCURSIÓN\n");
                     eliminarExcursion();
                     break;
                 case 3:
+
                     mostrarTodasLasExcursiones();
                     break;
                 case 4:
+
                     filtrarExcursionesPorFecha();
                     break;
                 case 0:
@@ -54,6 +61,19 @@ public class VistaExcursiones {
     private void agregarExcursion() {
         System.out.print("Código de la excursión: ");
         String codigo = scanner.nextLine();
+
+        // Verificar si el código de la excursión ya existe
+        try {
+            Excursion excursionExistente = controlador.buscarExcursionPorCodigo(codigo);
+            if (excursionExistente != null) {
+                System.out.println("Error: Ya existe una excursión con el código " + codigo + ". No se puede agregar una excursión con el mismo código.");
+                return;
+            }
+        } catch (Exception e) {
+            // Continuar si no existe la excursión (este es el comportamiento esperado)
+        }
+
+        // Pedir los demás datos de la excursión
         System.out.print("Descripción: ");
         String descripcion = scanner.nextLine();
         System.out.print("Fecha (dd/MM/yyyy): ");
@@ -65,9 +85,11 @@ public class VistaExcursiones {
         double precio = scanner.nextDouble();
         scanner.nextLine(); // Limpiar buffer
 
+        // Llamar al controlador para agregar la excursión
         controlador.agregarExcursion(codigo, descripcion, fecha, numeroDias, precio);
-        System.out.println("Excursión añadida correctamente.");
+        System.out.println("** Excursión añadida correctamente **");
     }
+
 
     private void eliminarExcursion() {
         System.out.print("Código de la excursión a eliminar: ");
@@ -75,7 +97,7 @@ public class VistaExcursiones {
 
         boolean eliminada = controlador.eliminarExcursion(codigoExcursion);
         if (eliminada) {
-            System.out.println("Excursión eliminada correctamente.");
+            System.out.println("** Excursión eliminada correctamente **");
         } else {
             System.out.println("No se pudo eliminar la excursión, está asociada a inscripciones o no existe.");
         }
@@ -86,7 +108,7 @@ public class VistaExcursiones {
         if (excursiones.isEmpty()) {
             System.out.println("No hay excursiones registradas.");
         } else {
-            System.out.println("Excursiones registradas:");
+            System.out.println("| EXCURSIONES REGISTRADAS:");
             for (Excursion excursion : excursiones) {
                 System.out.println(excursion.toString());
             }
@@ -94,22 +116,31 @@ public class VistaExcursiones {
     }
 
     private void filtrarExcursionesPorFecha() {
-        System.out.print("Fecha inicio (dd/MM/yyyy): ");
-        String fechaInicioStr = scanner.nextLine();
-        LocalDate fechaInicio = LocalDate.parse(fechaInicioStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        try {
+            // Pedir al usuario que ingrese las fechas
+            System.out.println("Ingrese la fecha de inicio (dd/MM/yyyy): ");
+            String fechaInicioStr = scanner.nextLine();
+            LocalDate fechaInicio = LocalDate.parse(fechaInicioStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        System.out.print("Fecha fin (dd/MM/yyyy): ");
-        String fechaFinStr = scanner.nextLine();
-        LocalDate fechaFin = LocalDate.parse(fechaFinStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            System.out.println("Ingrese la fecha de fin (dd/MM/yyyy): ");
+            String fechaFinStr = scanner.nextLine();
+            LocalDate fechaFin = LocalDate.parse(fechaFinStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        ArrayList<Excursion> excursionesFiltradas = controlador.filtrarExcursionesPorFecha(fechaInicio, fechaFin);
-        if (excursionesFiltradas.isEmpty()) {
-            System.out.println("No hay excursiones en el rango de fechas especificado.");
-        } else {
-            System.out.println("Excursiones en el rango de fechas:");
-            for (Excursion excursion : excursionesFiltradas) {
-                System.out.println(excursion.toString());
+            // Llamar al controlador para obtener las excursiones en ese rango de fechas
+            ArrayList<Excursion> excursionesFiltradas = controlador.filtrarExcursionesPorFecha(fechaInicio, fechaFin);
+
+            // Mostrar los resultados
+            if (excursionesFiltradas.isEmpty()) {
+                System.out.println("No se encontraron excursiones en el rango de fechas indicado.");
+            } else {
+                System.out.println("| EXCURSIONES ENTRE " + fechaInicio + " Y " + fechaFin + ":");
+                for (Excursion excursion : excursionesFiltradas) {
+                    System.out.println(excursion.toString());
+                }
             }
+        } catch (DateTimeParseException e) {
+            // Capturar el error si el formato de fecha es incorrecto
+            System.out.println("Error: Formato de fecha incorrecto. Use el formato dd/MM/yyyy.");
         }
     }
 }

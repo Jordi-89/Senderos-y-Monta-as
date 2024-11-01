@@ -40,11 +40,13 @@ public class Excursion {
     //toString
     @Override
     public String toString() {
-        return "Excursion: " +
+        return " Excursion: " +
                 "\nID excursión: " + codigoExcursion +
                 "\nDescripción: " + descripcion +
                 "\nFecha: " + fecha +
                 "\nNumero Días: " + numeroDias +
-                "\nPrecio: " + precioExcursion;
+                "\nPrecio: " + precioExcursion +
+                "\n-----------------------------";
+
     }
 }

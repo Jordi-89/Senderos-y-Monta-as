@@ -8,6 +8,7 @@ import javaEnjoyers.modelo.SocioEstandar;
 import javaEnjoyers.modelo.SocioFederado;
 import javaEnjoyers.modelo.SocioInfantil;
 import javaEnjoyers.modelo.TipoSeguro;
+import javaEnjoyers.modelo.excepciones.SocioNoEncontradoException;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -25,7 +26,9 @@ public class VistaSocios {
     public void mostrarMenuSocios() {
         int opcion;
         do {
-            System.out.println("Menú de Socios");
+            System.out.println("-------------------------------------------------");
+            System.out.println("                 Menú de Socios             ");
+            System.out.println("-------------------------------------------------");
             System.out.println("1. Añadir Socio Estándar");
             System.out.println("2. Añadir Socio Federado");
             System.out.println("3. Añadir Socio Infantil");
@@ -38,24 +41,31 @@ public class VistaSocios {
             scanner.nextLine(); // Limpiar buffer
             switch (opcion) {
                 case 1:
+                    System.out.println("\n| AÑADIR SOCIO ESTANDAR\n");
                     agregarSocioEstandar();
                     break;
                 case 2:
+                    System.out.println("\n| AÑADIR SOCIO FEDERADO\n");
                     agregarSocioFederado();
                     break;
                 case 3:
+                    System.out.println("\n| AÑADIR SOCIO INFANTIL\n");
                     agregarSocioInfantil();
                     break;
                 case 4:
+                    System.out.println("\n| ELIMINAR SOCIO\n");
                     eliminarSocio();
                     break;
                 case 5:
+                    System.out.println("\n| LISTADO DE SOCIOS\n");
                     mostrarTodosLosSocios();
                     break;
                 case 6:
+                    System.out.println("\n| MODIFICAR SEGUROS\n");
                     modificarSeguroSocioEstandar();
                     break;
                 case 7:
+                    System.out.println("\n| FACTURA MENSUAL\n");
                     mostrarFacturaMensual();
                     break;
                 case 0:
@@ -69,21 +79,68 @@ public class VistaSocios {
 
 
     private void agregarSocioEstandar() {
-        // Ejemplo de interacción para agregar un socio estándar
+        // Pedir el número de socio
         System.out.print("Número de Socio: ");
         String numeroSocio = scanner.nextLine();
+
+        // Verificar si el número de socio ya existe
+        try {
+            Socio socioExistente = controlador.buscarSocioPorNumero(numeroSocio);
+            if (socioExistente != null) {
+                System.out.println("Error: Ya existe un socio con el número " + numeroSocio + ". No se puede agregar un socio con el mismo número.");
+                return;
+            }
+        } catch (SocioNoEncontradoException e) {
+            // Continuar si no existe el socio
+        }
+
+        // Pedir los datos restantes
         System.out.print("Nombre: ");
         String nombre = scanner.nextLine();
         System.out.print("NIF: ");
         String nif = scanner.nextLine();
-        // Aquí se debería obtener el seguro disponible
-        Seguro seguro = new Seguro(TipoSeguro.BASICO, 20.0); // Ejemplo de seguro
+
+        // Mostrar opciones de seguros
+        System.out.println("Seleccione el tipo de seguro:");
+        System.out.println("1. Básico (20.0€)");
+        System.out.println("2. Completo (50.0€)");
+        System.out.print("Seleccione una opción (1 o 2): ");
+        int opcionSeguro = scanner.nextInt();
+        scanner.nextLine();  // Limpiar el buffer de entrada
+
+        // Asignar el seguro en función de la opción seleccionada
+        Seguro seguro;
+        if (opcionSeguro == 1) {
+            seguro = new Seguro(TipoSeguro.BASICO, 20.0);  // Seguro básico
+        } else if (opcionSeguro == 2) {
+            seguro = new Seguro(TipoSeguro.COMPLETO, 50.0);  // Seguro completo
+        } else {
+            System.out.println("Opción de seguro no válida. No se ha podido agregar el socio.");
+            return;
+        }
+
+        // Llamar al controlador para agregar el socio estándar
         controlador.agregarSocioEstandar(numeroSocio, nombre, nif, seguro);
+        System.out.println("** Socio estándar añadido correctamente **");
     }
 
     private void agregarSocioFederado() {
+        // Pedir el número de socio
         System.out.print("Número de Socio: ");
         String numeroSocio = scanner.nextLine();
+
+        // Verificar si el número de socio ya existe
+        try {
+            Socio socioExistente = controlador.buscarSocioPorNumero(numeroSocio);
+            if (socioExistente != null) {
+                System.out.println("Error: Ya existe un socio con el número " + numeroSocio + ". No se puede agregar un socio con el mismo número.");
+                return;
+            }
+        } catch (SocioNoEncontradoException e) {
+            // Continuar si no existe el socio
+        }
+
+        // Pedir el resto de los datos del socio
         System.out.print("Nombre: ");
         String nombre = scanner.nextLine();
         System.out.print("NIF: ");
@@ -115,36 +172,57 @@ public class VistaSocios {
 
         // Llamar al controlador para agregar el socio federado
         controlador.agregarSocioFederado(numeroSocio, nombre, nif, federacionSeleccionada);
-        System.out.println("Socio federado añadido correctamente.");
+        System.out.println("** Socio federado añadido correctamente **");
     }
 
+
     private void agregarSocioInfantil() {
+        // Pedir el número de socio infantil
         System.out.print("Número de Socio del niño: ");
         String numeroSocioInfantil = scanner.nextLine();
+
+        // Verificar si el número de socio ya existe
+        try {
+            Socio socioExistente = controlador.buscarSocioPorNumero(numeroSocioInfantil);
+            if (socioExistente != null) {
+                System.out.println("Error: Ya existe un socio con el número " + numeroSocioInfantil + ". No se puede agregar un socio con el mismo número.");
+                return;
+            }
+        } catch (SocioNoEncontradoException e) {
+            // Continuar si no existe el socio (este es el comportamiento esperado)
+        }
+
+        // Pedir los datos restantes
         System.out.print("Nombre del niño: ");
         String nombre = scanner.nextLine();
 
+        // Verificar el número de socio del padre o madre
         System.out.print("Número de Socio del padre o madre: ");
         String numeroSocioAdulto = scanner.nextLine();
 
-        // Verificar si el número de socio adulto existe
-        Socio socioAdulto = controlador.buscarSocioPorNumero(numeroSocioAdulto);
-        if (socioAdulto == null) {
-            System.out.println("El número de socio del padre o madre no existe.");
+        try {
+            Socio socioAdulto = controlador.buscarSocioPorNumero(numeroSocioAdulto);
+            if (socioAdulto == null) {
+                System.out.println("El número de socio del padre o madre no existe.");
+                return;
+            }
+        } catch (SocioNoEncontradoException e) {
+            System.out.println(e.getMessage());
             return;
         }
 
         // Llamar al controlador para agregar el socio infantil
         controlador.agregarSocioInfantil(numeroSocioInfantil, nombre, numeroSocioAdulto);
-        System.out.println("Socio infantil añadido correctamente.");
+        System.out.println("** Socio infantil añadido correctamente **");
     }
+
 
     private void eliminarSocio() {
         System.out.print("Número de Socio a eliminar: ");
         String numeroSocio = scanner.nextLine();
         boolean eliminado = controlador.eliminarSocio(numeroSocio);
         if (eliminado) {
-            System.out.println("Socio eliminado correctamente.");
+            System.out.println("** Socio eliminado correctamente **");
         } else {
             System.out.println("No se pudo eliminar el socio.");
         }
@@ -166,9 +244,16 @@ public class VistaSocios {
         System.out.print("Ingrese el número del socio estándar: ");
         String numeroSocio = scanner.nextLine();
 
-        Socio socio = controlador.buscarSocioPorNumero(numeroSocio);
-        if (socio == null || !(socio instanceof SocioEstandar)) {
-            System.out.println("El socio no existe o no es un socio estándar.");
+        Socio socio;
+        try {
+            socio = controlador.buscarSocioPorNumero(numeroSocio);
+        } catch (SocioNoEncontradoException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        if (!(socio instanceof SocioEstandar)) {
+            System.out.println("El socio no es un socio estándar.");
             return;
         }
 
@@ -191,7 +276,7 @@ public class VistaSocios {
         }
 
         controlador.modificarSeguroSocioEstandar(numeroSocio, nuevoSeguro);
-        System.out.println("El tipo de seguro ha sido actualizado.");
+        System.out.println("** El tipo de seguro ha sido actualizado **");
     }
 
     private void mostrarFacturaMensual() {
@@ -205,66 +290,4 @@ public class VistaSocios {
             System.out.println("La factura mensual del socio " + numeroSocio + " es: " + factura + " €");
         }
     }
-
-    private SocioEstandar agregarSocioEstandar(String numeroSocio, String nombre) {
-        System.out.print("NIF: ");
-        String nif = scanner.nextLine();
-
-        System.out.println("Seleccione tipo de seguro:");
-        System.out.println("1. Básico");
-        System.out.println("2. Completo");
-        int tipoSeguro = scanner.nextInt();
-        scanner.nextLine(); // Limpiar buffer
-
-        Seguro seguro = null;
-        if (tipoSeguro == 1) {
-            seguro = new Seguro(TipoSeguro.BASICO, 20.0);
-        } else if (tipoSeguro == 2) {
-            seguro = new Seguro(TipoSeguro.COMPLETO, 50.0);
-        } else {
-            System.out.println("Opción de seguro no válida.");
-            return null;
-        }
-        return new SocioEstandar(numeroSocio, nombre, nif, seguro);
-    }
-
-    private SocioFederado agregarSocioFederado(String numeroSocio, String nombre) {
-        System.out.print("NIF: ");
-        String nif = scanner.nextLine();
-
-        // Listar las federaciones disponibles
-        ArrayList<Federacion> federaciones = controlador.mostrarFederaciones();  // Metodo del controlador para obtener federaciones
-        if (federaciones.isEmpty()) {
-            System.out.println("No hay federaciones disponibles.");
-            return null;
-        }
-
-        System.out.println("Seleccione una federación:");
-        for (int i = 0; i < federaciones.size(); i++) {
-            System.out.println((i + 1) + ". " + federaciones.get(i).getNombre());
-        }
-        int opcionFederacion = scanner.nextInt();
-        scanner.nextLine();  // Limpiar buffer
-
-        if (opcionFederacion < 1 || opcionFederacion > federaciones.size()) {
-            System.out.println("Opción no válida.");
-            return null;
-        }
-        Federacion federacionSeleccionada = federaciones.get(opcionFederacion - 1);
-        return new SocioFederado(numeroSocio, nombre, nif, federacionSeleccionada);
-    }
-
-    private SocioInfantil agregarSocioInfantil(String numeroSocio, String nombre) {
-        System.out.print("Número de Socio del padre o madre: ");
-        String numeroSocioAdulto = scanner.nextLine();
-
-        Socio adulto = controlador.buscarSocioPorNumero(numeroSocioAdulto);
-        if (adulto == null) {
-            System.out.println("El padre o madre no existe.");
-            return null;
-        }
-        return new SocioInfantil(numeroSocio, nombre, numeroSocioAdulto);
-    }
-
-
 }

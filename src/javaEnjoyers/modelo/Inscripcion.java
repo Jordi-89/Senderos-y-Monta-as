@@ -38,5 +38,6 @@ public class Inscripcion {
         return "Inscripción: " + codigoInscripcion +
                 "\nSocio: " + socio +
                 "\nExcursion: " + excursion;
+
     }
 }

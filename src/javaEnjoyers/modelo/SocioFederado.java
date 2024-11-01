@@ -25,14 +25,27 @@ public class SocioFederado extends Socio {
 
     @Override
     public double calcularCuotaMensual() {
-        double cuotaMensual = 10.0 * 0.95;  // Cuota base con un descuento del 5%
+        double cuotaBase = 10.0 * 0.95;  // Cuota base con 5% de descuento
+        double totalExcursiones = 0.0;
 
-        // Sumar el costo de cada excursión con un 10% de descuento
+        // Calcular el costo total de las excursiones con un 10% de descuento
         for (Inscripcion inscripcion : this.getInscripciones()) {
-            cuotaMensual += inscripcion.getExcursion().getPrecioExcursion() * 0.90;
+            totalExcursiones += inscripcion.getExcursion().getPrecioExcursion() * 0.90;
         }
-        return cuotaMensual;
+
+        // Desglose de los componentes de la factura
+        System.out.println("Desglose de la factura mensual (Socio Federado):");
+        System.out.println("Cuota base con descuento (5%): " + cuotaBase + " €");
+        System.out.println("Costo de excursiones con descuento (10%): " + totalExcursiones + " €");
+        System.out.println("Seguro: Cubierto por la federación");
+
+        // Calcular el total
+        double total = cuotaBase + totalExcursiones;
+        System.out.println("Total a pagar: " + total + " €");
+
+        return total;
     }
+
 
 
 
@@ -40,7 +53,10 @@ public class SocioFederado extends Socio {
     @Override
     public String toString() {
         return "Socio Federado: " +
+                "\nNumero socio: " + getNumeroSocio() +
+                "\nNombre: " + getNombre() +
                 "\nNIF: " + nif +
                 "\nFederación: " + federacion;
+
     }
 }

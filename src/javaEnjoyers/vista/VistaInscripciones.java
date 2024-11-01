@@ -2,7 +2,10 @@ package javaEnjoyers.vista;
 
 import javaEnjoyers.controlador.Controlador;
 import javaEnjoyers.modelo.*;
+import javaEnjoyers.modelo.excepciones.InscripcionNoEliminableException;
+import javaEnjoyers.modelo.excepciones.SocioNoEncontradoException;
 
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.time.LocalDate;
@@ -21,7 +24,9 @@ public class VistaInscripciones {
     public void mostrarMenuInscripciones() {
         int opcion;
         do {
-            System.out.println("Menú de Inscripciones");
+            System.out.println("-------------------------------------------------");
+            System.out.println("              Menú de Inscripciones            ");
+            System.out.println("-------------------------------------------------");
             System.out.println("1. Añadir Inscripción");
             System.out.println("2. Eliminar Inscripción");
             System.out.println("3. Mostrar todas las inscripciones");
@@ -33,18 +38,23 @@ public class VistaInscripciones {
             scanner.nextLine(); // Limpiar buffer
             switch (opcion) {
                 case 1:
+                    System.out.println("\n| AÑADIR INSCRIPCION\n");
                     agregarInscripcion();
                     break;
                 case 2:
+                    System.out.println("\n| ELIMINAR INSCRIPCIÓN\n");
                     eliminarInscripcion();
                     break;
                 case 3:
+
                     mostrarTodasLasInscripciones();
                     break;
                 case 4:
+                    System.out.println("\n| INSCRIPCIONES POR SOCIO\n");
                     mostrarInscripcionesPorSocio();
                     break;
                 case 5:
+                    System.out.println("\n| INSCRIPCIONES POR EXCURSIÓN\n");
                     mostrarInscripcionesPorExcursion();
                     break;
                 case 6:
@@ -59,20 +69,35 @@ public class VistaInscripciones {
         } while (opcion != 0);
     }
 
-
     private void agregarInscripcion() {
         System.out.print("Código de inscripción: ");
         String codigoInscripcion = scanner.nextLine();
 
-        System.out.print("Número de Socio: ");
-        String numeroSocio = scanner.nextLine();
-        Socio socio = controlador.buscarSocioPorNumero(numeroSocio);
-
-        if (socio == null) {
-            System.out.println("El socio no existe. Vamos a registrarlo.");
-            socio = agregarNuevoSocio(numeroSocio);  // Llamar a un metodo para agregar nuevo socio
+        // Verificar si el código de la inscripción ya existe
+        try {
+            Inscripcion inscripcionExistente = controlador.buscarInscripcionPorCodigo(codigoInscripcion);
+            if (inscripcionExistente != null) {
+                System.out.println("Error: Ya existe una inscripción con el código " + codigoInscripcion + ". No se puede agregar una inscripción con el mismo código.");
+                return;
+            }
+        } catch (Exception e) {
+            // Continuar si no existe la inscripción
         }
 
+        // Pedir el número de socio
+        System.out.print("Número de Socio: ");
+        String numeroSocio = scanner.nextLine();
+
+        Socio socio;
+        try {
+            socio = controlador.buscarSocioPorNumero(numeroSocio);  // Verificar si el socio existe
+        } catch (SocioNoEncontradoException e) {
+            System.out.println(e.getMessage());  // Mostrar el mensaje de la excepción
+            System.out.println("El socio no existe. Vamos a registrarlo.");
+            socio = agregarNuevoSocio(numeroSocio);  // Llamar al método para agregar un nuevo socio
+        }
+
+        // Pedir el código de la excursión
         System.out.print("Código de la Excursión: ");
         String codigoExcursion = scanner.nextLine();
         Excursion excursion = controlador.buscarExcursionPorCodigo(codigoExcursion);
@@ -81,9 +106,11 @@ public class VistaInscripciones {
             return;
         }
 
+        // Llamar al controlador para agregar la inscripción
         controlador.agregarInscripcion(codigoInscripcion, numeroSocio, codigoExcursion);
-        System.out.println("Inscripción añadida correctamente.");
+        System.out.println("** Inscripción añadida correctamente **");
     }
+
 
     private Socio agregarNuevoSocio(String numeroSocio) {
         System.out.print("Nombre del Socio: ");
@@ -113,7 +140,7 @@ public class VistaInscripciones {
                 return null;
         }
         controlador.agregarSocio(nuevoSocio);  // Guardar el nuevo socio en el sistema
-        System.out.println("Socio añadido correctamente.");
+        System.out.println("** Socio añadido correctamente **");
         return nuevoSocio;
     }
 
@@ -147,7 +174,7 @@ public class VistaInscripciones {
         String nif = scanner.nextLine();
 
         // Listar las federaciones disponibles
-        ArrayList<Federacion> federaciones = controlador.mostrarFederaciones();  // Método del controlador para obtener federaciones
+        ArrayList<Federacion> federaciones = controlador.mostrarFederaciones();  // Metodo del controlador para obtener federaciones
         if (federaciones.isEmpty()) {
             System.out.println("No hay federaciones disponibles.");
             return null;
@@ -173,10 +200,12 @@ public class VistaInscripciones {
         System.out.print("Número de Socio del padre o madre: ");
         String numeroSocioAdulto = scanner.nextLine();
 
-        Socio adulto = controlador.buscarSocioPorNumero(numeroSocioAdulto);
-        if (adulto == null) {
-            System.out.println("El padre o madre no existe.");
-            return null;
+        Socio adulto;
+        try {
+            adulto = controlador.buscarSocioPorNumero(numeroSocioAdulto);  // Aquí manejamos la excepción
+        } catch (SocioNoEncontradoException e) {
+            System.out.println(e.getMessage());  // Mostrar el mensaje de la excepción
+            return null;  // Salir si no se encuentra el padre o la madre
         }
         return new SocioInfantil(numeroSocio, nombre, numeroSocioAdulto);
     }
@@ -185,11 +214,12 @@ public class VistaInscripciones {
         System.out.print("Código de inscripción a eliminar: ");
         String codigoInscripcion = scanner.nextLine();
 
-        boolean eliminada = controlador.eliminarInscripcion(codigoInscripcion);
-        if (eliminada) {
-            System.out.println("Inscripción eliminada correctamente.");
-        } else {
-            System.out.println("No se pudo eliminar la inscripción.");
+        try {
+            controlador.eliminarInscripcion(codigoInscripcion);  // Llamar al metodo que puede lanzar la excepción
+            System.out.println("** Inscripción eliminada correctamente **");
+        } catch (InscripcionNoEliminableException e) {
+            // Capturar la excepción y mostrar el mensaje al usuario
+            System.out.println(e.getMessage());  // Mostrar el mensaje de error de la excepción
         }
     }
 
@@ -198,7 +228,7 @@ public class VistaInscripciones {
         if (inscripciones.isEmpty()) {
             System.out.println("No hay inscripciones registradas.");
         } else {
-            System.out.println("Inscripciones registradas:");
+            System.out.println("| INSCRIPCIONES REGISTRADA:");
             for (Inscripcion inscripcion : inscripciones) {
                 System.out.println(inscripcion.toString());
             }
@@ -206,16 +236,23 @@ public class VistaInscripciones {
     }
 
     private void mostrarInscripcionesPorSocio() {
-        System.out.print("Número de Socio: ");
+        System.out.print("Ingrese el número de socio: ");
         String numeroSocio = scanner.nextLine();
-        ArrayList<Inscripcion> inscripciones = controlador.mostrarInscripcionesPorSocio(numeroSocio);
-        if (inscripciones.isEmpty()) {
-            System.out.println("El socio no tiene inscripciones registradas.");
-        } else {
-            System.out.println("Inscripciones del socio:");
-            for (Inscripcion inscripcion : inscripciones) {
-                System.out.println(inscripcion.toString());
+
+        try {
+            Socio socio = controlador.buscarSocioPorNumero(numeroSocio);
+            ArrayList<Inscripcion> inscripciones = controlador.mostrarInscripcionesPorSocio(numeroSocio);
+
+            if (inscripciones.isEmpty()) {
+                System.out.println("El socio no tiene inscripciones.");
+            } else {
+                System.out.println("| Inscripciones del socio " + socio.getNombre() + ":");
+                for (Inscripcion inscripcion : inscripciones) {
+                    System.out.println(inscripcion.toString());
+                }
             }
+        } catch (SocioNoEncontradoException e) {
+            System.out.println(e.getMessage());  // Mostrar el mensaje de la excepción personalizada
         }
     }
 
@@ -226,7 +263,7 @@ public class VistaInscripciones {
         if (inscripciones.isEmpty()) {
             System.out.println("No hay inscripciones para esta excursión.");
         } else {
-            System.out.println("Inscripciones de la excursión:");
+            System.out.println("| INSCRIPCIONES A LA EXCURSIÓN:");
             for (Inscripcion inscripcion : inscripciones) {
                 System.out.println(inscripcion.toString());
             }
@@ -234,25 +271,27 @@ public class VistaInscripciones {
     }
 
     private void mostrarInscripcionesPorFecha() {
-        System.out.println("Ingrese la fecha de inicio (dd/MM/yyyy): ");
-        String fechaInicioStr = scanner.nextLine();
-        LocalDate fechaInicio = LocalDate.parse(fechaInicioStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        try {
+            System.out.println("Ingrese la fecha de inicio (dd/MM/yyyy): ");
+            String fechaInicioStr = scanner.nextLine();
+            LocalDate fechaInicio = LocalDate.parse(fechaInicioStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        System.out.println("Ingrese la fecha de fin (dd/MM/yyyy): ");
-        String fechaFinStr = scanner.nextLine();
-        LocalDate fechaFin = LocalDate.parse(fechaFinStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            System.out.println("Ingrese la fecha de fin (dd/MM/yyyy): ");
+            String fechaFinStr = scanner.nextLine();
+            LocalDate fechaFin = LocalDate.parse(fechaFinStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        // Llamar al controlador para obtener las inscripciones en ese rango de fechas
-        ArrayList<Inscripcion> inscripcionesFiltradas = controlador.mostrarInscripcionesPorFecha(fechaInicio, fechaFin);
+            ArrayList<Inscripcion> inscripcionesFiltradas = controlador.mostrarInscripcionesPorFecha(fechaInicio, fechaFin);
 
-        // Mostrar los resultados
-        if (inscripcionesFiltradas.isEmpty()) {
-            System.out.println("No se encontraron inscripciones en el rango de fechas indicado.");
-        } else {
-            System.out.println("Inscripciones entre " + fechaInicio + " y " + fechaFin + ":");
-            for (Inscripcion inscripcion : inscripcionesFiltradas) {
-                System.out.println(inscripcion.toString());
+            if (inscripcionesFiltradas.isEmpty()) {
+                System.out.println("No se encontraron inscripciones en el rango de fechas indicado.");
+            } else {
+                System.out.println("| INSCRIPCIONES ENTRE " + fechaInicio + " Y " + fechaFin + ":");
+                for (Inscripcion inscripcion : inscripcionesFiltradas) {
+                    System.out.println(inscripcion.toString());
+                }
             }
+        } catch (DateTimeParseException e) {
+            System.out.println("Error: Formato de fecha incorrecto. Use el formato dd/MM/yyyy.");
         }
     }
 
