@@ -1,6 +1,7 @@
 package javaEnjoyers;
 
 import javaEnjoyers.controlador.Controlador;
+import javaEnjoyers.modelo.DatabaseConnection;
 import javaEnjoyers.modelo.Datos;
 import javaEnjoyers.vista.VistaPrincipal;
 
@@ -14,5 +15,7 @@ public class Main {
         // Iniciamos la vista principal
         VistaPrincipal vistaPrincipal = new VistaPrincipal(controlador);
         vistaPrincipal.mostrarMenuPrincipal();
+
+        DatabaseConnection.testConnection();
     }
 }
