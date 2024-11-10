@@ -8,7 +8,7 @@ import java.util.List;
 public interface InscripcionDAO {
     Inscripcion findByCodigo(String codigo);
     List<Inscripcion> findAll();
-    List<Inscripcion> findBySocio(String numeroSocio);
+    List<Inscripcion> findByNumeroSocio(String numeroSocio);
     List<Inscripcion> findByExcursion(String codigoExcursion);
     List<Inscripcion> findByFecha(LocalDate fechaInicio, LocalDate fechaFin);
     void save(Inscripcion inscripcion);

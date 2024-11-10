@@ -7,9 +7,9 @@ public class Seguro {
     private double precioSeguro;
 
     //Constructor
-    public Seguro(TipoSeguro tipoSeguro, double precio){
+    public Seguro(TipoSeguro tipoSeguro, double precioSeguro){
         this.tipoSeguro = tipoSeguro;
-        this.precioSeguro = precio;
+        this.precioSeguro = precioSeguro;
     }
 
     //Getters y Setters

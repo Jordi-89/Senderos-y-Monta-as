@@ -4,6 +4,7 @@ import javaEnjoyers.modelo.Excursion;
 import javaEnjoyers.modelo.dao.ExcursionDAO;
 import javaEnjoyers.modelo.dao.DAOFactoryProvider;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class ExcursionService {
@@ -19,6 +20,10 @@ public class ExcursionService {
 
     public Excursion findByCodigo(String codigoExcursion) {
         return excursionDAO.findByCodigo(codigoExcursion);
+    }
+
+    public List<Excursion> findByFecha(LocalDate fechaInicio, LocalDate fechaFin) {
+        return excursionDAO.findByFecha(fechaInicio, fechaFin);
     }
 
     public void save(Excursion excursion) {

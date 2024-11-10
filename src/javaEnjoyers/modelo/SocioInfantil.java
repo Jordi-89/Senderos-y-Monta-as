@@ -46,7 +46,7 @@ public class SocioInfantil extends Socio {
     //toString
     @Override
     public String toString() {
-        return "SocioInfantil: " +
+        return "----SocioInfantil: " +
                 "\nNumero socio: " + getNumeroSocio() +
                 "\nNombre: " + getNombre() +
                 "\nNúmero Socio Adulto: " + numeroSocioAdulto;

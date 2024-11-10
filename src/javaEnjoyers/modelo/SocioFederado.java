@@ -49,11 +49,10 @@ public class SocioFederado extends Socio {
     //toString
     @Override
     public String toString() {
-        return "Socio Federado: " +
+        return "----Socio Federado: " +
                 "\nNumero socio: " + getNumeroSocio() +
                 "\nNombre: " + getNombre() +
                 "\nNIF: " + nif +
                 "\nFederación: " + federacion;
-
     }
 }

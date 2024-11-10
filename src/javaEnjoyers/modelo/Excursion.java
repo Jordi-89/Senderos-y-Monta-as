@@ -12,12 +12,12 @@ public class Excursion {
     private double precioExcursion;
 
     //Constructor
-    public Excursion(String codigoExcursion, String descripcion, LocalDate fecha, int numeroDias, double precio){
+    public Excursion(String codigoExcursion, String descripcion, LocalDate fecha, int numeroDias, double precioExcursion){
         this.codigoExcursion = codigoExcursion;
         this.descripcion = descripcion;
         this.fecha = fecha;
         this.numeroDias = numeroDias;
-        this.precioExcursion = precio;
+        this.precioExcursion = precioExcursion;
     }
 
     //Getters y Setters
@@ -30,23 +30,20 @@ public class Excursion {
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
     public void setFecha(LocalDate fecha) { this.fecha = fecha; }
     public void setNumeroDias(int numeroDias) { this.numeroDias = numeroDias; }
-    public void setPrecioExcursion(double precio) {
-        if (precio < 0) {
+    public void setPrecioExcursion(double precioExcursion) {
+        if (precioExcursion < 0) {
             throw new IllegalArgumentException("El precio de la excursión no puede ser negativo.");
         }
-        this.precioExcursion = precio;
+        this.precioExcursion = precioExcursion;
     }
 
     //toString
     @Override
     public String toString() {
-        return " Excursion: " +
-                "\nID excursión: " + codigoExcursion +
+        return "\nCódigo excursión: " + codigoExcursion +
                 "\nDescripción: " + descripcion +
                 "\nFecha: " + fecha +
                 "\nNumero Días: " + numeroDias +
-                "\nPrecio: " + precioExcursion +
-                "\n-----------------------------";
-
+                "\nPrecio Excursión: " + precioExcursion;
     }
 }

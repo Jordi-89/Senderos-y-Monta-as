@@ -30,8 +30,8 @@ public class InscripcionService {
         inscripcionDAO.delete(codigoInscripcion);
     }
 
-    public List<Inscripcion> findBySocio(String numeroSocio) {
-        return inscripcionDAO.findBySocio(numeroSocio);
+    public List<Inscripcion> findByNumeroSocio(String numeroSocio) {
+        return inscripcionDAO.findByNumeroSocio(numeroSocio);
     }
 
     public List<Inscripcion> findByExcursion(String codigoExcursion) {

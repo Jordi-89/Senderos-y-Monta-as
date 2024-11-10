@@ -6,7 +6,7 @@ import javaEnjoyers.modelo.Excursion;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class VistaExcursiones {
@@ -33,27 +33,12 @@ public class VistaExcursiones {
             opcion = scanner.nextInt();
             scanner.nextLine(); // Limpiar buffer
             switch (opcion) {
-                case 1:
-                    System.out.println("\n| AÑADIR EXCURSIÓN\n");
-                    agregarExcursion();
-                    break;
-                case 2:
-                    System.out.println("\n| ELIMINAR EXCURSIÓN\n");
-                    eliminarExcursion();
-                    break;
-                case 3:
-
-                    mostrarTodasLasExcursiones();
-                    break;
-                case 4:
-
-                    filtrarExcursionesPorFecha();
-                    break;
-                case 0:
-                    System.out.println("Volviendo...");
-                    break;
-                default:
-                    System.out.println("Opción no válida.");
+                case 1 -> agregarExcursion();
+                case 2 -> eliminarExcursion();
+                case 3 -> mostrarTodasLasExcursiones();
+                case 4 -> filtrarExcursionesPorFecha();
+                case 0 -> System.out.println("Volviendo...");
+                default -> System.out.println("Opción no válida.");
             }
         } while (opcion != 0);
     }
@@ -63,14 +48,10 @@ public class VistaExcursiones {
         String codigo = scanner.nextLine();
 
         // Verificar si el código de la excursión ya existe
-        try {
-            Excursion excursionExistente = controlador.buscarExcursionPorCodigo(codigo);
-            if (excursionExistente != null) {
-                System.out.println("Error: Ya existe una excursión con el código " + codigo + ". No se puede agregar una excursión con el mismo código.");
-                return;
-            }
-        } catch (Exception e) {
-            // Continuar si no existe la excursión (este es el comportamiento esperado)
+        Excursion excursionExistente = controlador.buscarExcursionPorCodigo(codigo);
+        if (excursionExistente != null) {
+            System.out.println("Error: Ya existe una excursión con el código " + codigo + ". No se puede agregar una excursión con el mismo código.");
+            return;
         }
 
         // Pedir los demás datos de la excursión
@@ -90,7 +71,6 @@ public class VistaExcursiones {
         System.out.println("** Excursión añadida correctamente **");
     }
 
-
     private void eliminarExcursion() {
         System.out.print("Código de la excursión a eliminar: ");
         String codigoExcursion = scanner.nextLine();
@@ -104,7 +84,7 @@ public class VistaExcursiones {
     }
 
     private void mostrarTodasLasExcursiones() {
-        ArrayList<Excursion> excursiones = controlador.mostrarExcursiones();
+        List<Excursion> excursiones = controlador.mostrarExcursiones();
         if (excursiones.isEmpty()) {
             System.out.println("No hay excursiones registradas.");
         } else {
@@ -127,7 +107,7 @@ public class VistaExcursiones {
             LocalDate fechaFin = LocalDate.parse(fechaFinStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
             // Llamar al controlador para obtener las excursiones en ese rango de fechas
-            ArrayList<Excursion> excursionesFiltradas = controlador.filtrarExcursionesPorFecha(fechaInicio, fechaFin);
+            List<Excursion> excursionesFiltradas = controlador.filtrarExcursionesPorFecha(fechaInicio, fechaFin);
 
             // Mostrar los resultados
             if (excursionesFiltradas.isEmpty()) {

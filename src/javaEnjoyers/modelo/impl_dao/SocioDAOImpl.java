@@ -24,7 +24,7 @@ public class SocioDAOImpl implements SocioDAO {
                 String nombre = rs.getString("nombre");
                 String nif = rs.getString("nif");
                 Seguro seguro = obtenerSeguro(rs.getInt("seguro_id"));
-                Federacion federacion = obtenerFederacion(rs.getInt("federacion_id"));
+                Federacion federacion = obtenerFederacion(rs.getString("codigo_Federacion"));
                 String numeroSocioAdulto = rs.getString("numeroSocioAdulto");
 
                 return SocioFactory.createSocio(tipo, numeroSocio, nombre, nif, seguro, federacion, numeroSocioAdulto);
@@ -36,13 +36,27 @@ public class SocioDAOImpl implements SocioDAO {
     }
 
     private Seguro obtenerSeguro(int seguroId) {
-        SeguroDAO seguroDAO = new SeguroDAOImpl();
-        return seguroDAO.findById(seguroId);
+        String query = "SELECT tipo, precio FROM seguro WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, seguroId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                TipoSeguro tipo = TipoSeguro.valueOf(rs.getString("tipo"));
+                double precio = rs.getDouble("precio");
+                return new Seguro(tipo, precio);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    private Federacion obtenerFederacion(int federacionId) {
+    private Federacion obtenerFederacion(String codigoFederacion) {
         FederacionDAO federacionDAO = new FederacionDAOImpl();
-        return federacionDAO.findById(federacionId);
+        return federacionDAO.findByCodigo(codigoFederacion);
     }
 
     @Override
@@ -58,7 +72,7 @@ public class SocioDAOImpl implements SocioDAO {
                 String nombre = rs.getString("nombre");
                 String nif = rs.getString("nif");
                 Seguro seguro = obtenerSeguro(rs.getInt("seguro_id"));
-                Federacion federacion = obtenerFederacion(rs.getInt("federacion_id"));
+                Federacion federacion = obtenerFederacion(rs.getString("codigo_Federacion"));
                 String numeroSocioAdulto = rs.getString("numeroSocioAdulto");
 
                 Socio socio = SocioFactory.createSocio(tipo, numeroSocio, nombre, nif, seguro, federacion, numeroSocioAdulto);
@@ -98,13 +112,22 @@ public class SocioDAOImpl implements SocioDAO {
 
     @Override
     public void delete(String numeroSocio) {
-        String query = "DELETE FROM Socio WHERE numeroSocio = ?";
+        String deleteQuery = "DELETE FROM socio WHERE numeroSocio = ?";
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+
             stmt.setString(1, numeroSocio);
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("** Socio eliminado correctamente **");
+            } else {
+                System.out.println("No se encontró un socio con el número proporcionado.");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 }

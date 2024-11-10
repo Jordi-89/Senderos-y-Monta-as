@@ -2,7 +2,8 @@
 package javaEnjoyers.modelo.dao;
 
 import javaEnjoyers.modelo.Seguro;
+import javaEnjoyers.modelo.TipoSeguro;
 
 public interface SeguroDAO {
-    Seguro findById(int id);
+    Seguro findByTipoSeguro(TipoSeguro tipoSeguro);
 }

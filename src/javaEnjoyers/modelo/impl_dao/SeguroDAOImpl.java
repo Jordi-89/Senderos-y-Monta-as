@@ -12,17 +12,17 @@ import java.sql.SQLException;
 
 public class SeguroDAOImpl implements SeguroDAO {
 
-    @Override
-    public Seguro findById(int id) {
-        String query = "SELECT * FROM Seguro WHERE id = ?";
+    public Seguro findByTipoSeguro(TipoSeguro tipoSeguro) {
+        String query = "SELECT * FROM Seguro WHERE tipoSeguro = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, id);
+
+            stmt.setString(1, tipoSeguro.name()); // Utilizamos name() para pasar el nombre del enum como String
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
-                TipoSeguro tipoSeguro = TipoSeguro.valueOf(rs.getString("tipo"));
-                double precio = rs.getDouble("precio");
-                return new Seguro(tipoSeguro, precio);
+                double precioSeguro = rs.getDouble("precio");
+                return new Seguro(tipoSeguro, precioSeguro);
             }
         } catch (SQLException e) {
             e.printStackTrace();

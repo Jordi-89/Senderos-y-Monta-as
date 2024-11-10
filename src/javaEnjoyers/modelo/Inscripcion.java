@@ -35,7 +35,8 @@ public class Inscripcion {
     //toString
     @Override
     public String toString() {
-        return "Inscripción: " + codigoInscripcion +
+        return "------------------------------------" +
+                "\nInscripción: " + codigoInscripcion +
                 "\nSocio: " + socio +
                 "\nExcursion: " + excursion;
 

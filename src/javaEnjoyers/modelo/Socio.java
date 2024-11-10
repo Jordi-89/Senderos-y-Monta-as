@@ -1,13 +1,14 @@
 package javaEnjoyers.modelo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Socio {
 
     //Atributos
     private String numeroSocio;
     private String nombre;
-    private ArrayList<Inscripcion> inscripciones;
+    private List<Inscripcion> inscripciones;
 
     //Constructor
     public Socio(String numeroSocio, String nombre){
@@ -19,15 +20,15 @@ public abstract class Socio {
     //Getters y Setters
     public String getNumeroSocio() { return numeroSocio; }
     public String getNombre() { return nombre; }
-    public ArrayList<Inscripcion> getInscripciones() { return inscripciones; }
+    public List<Inscripcion> getInscripciones() { return inscripciones; }
     public void setNumeroSocio(String numeroSocio) { this.numeroSocio = numeroSocio; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setInscripciones(List<Inscripcion> inscripciones) { this.inscripciones = inscripciones; }
 
     //Métodos
     public double calcularCuotaMensual() {
         return 10.0;  // Cuota mensual fija de 10€
     }
-
     public void agregarInscripcionSocios(Inscripcion inscripcion) {
         inscripciones.add(inscripcion);
     }
@@ -35,8 +36,7 @@ public abstract class Socio {
     //toString
     @Override
     public String toString() {
-        return "Socio: " +
-                "\nNúmero de javaEnjoyers.modulo.socio: " + numeroSocio +
+        return "\nNúmero de socio: " + numeroSocio +
                 "\nNombre: " + nombre;
     }
 }

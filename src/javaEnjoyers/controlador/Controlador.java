@@ -1,109 +1,111 @@
 package javaEnjoyers.controlador;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import javaEnjoyers.modelo.Datos;
-import javaEnjoyers.modelo.Socio;
-import javaEnjoyers.modelo.SocioEstandar;
-import javaEnjoyers.modelo.SocioFederado;
-import javaEnjoyers.modelo.SocioInfantil;
-import javaEnjoyers.modelo.Excursion;
-import javaEnjoyers.modelo.Inscripcion;
-import javaEnjoyers.modelo.Seguro;
-import javaEnjoyers.modelo.Federacion;
+import java.util.List;
+
+import javaEnjoyers.modelo.*;
+import javaEnjoyers.modelo.impl_dao.FederacionDAOImpl;
+import javaEnjoyers.modelo.impl_dao.SocioEstandarDAOImpl;
+import javaEnjoyers.modelo.impl_dao.SocioFederadoDAOImpl;
+import javaEnjoyers.modelo.impl_dao.SocioInfantilDAOImpl;
+import javaEnjoyers.service.ExcursionService;
+import javaEnjoyers.service.InscripcionService;
+import javaEnjoyers.service.SocioService;
 import javaEnjoyers.modelo.excepciones.InscripcionNoEliminableException;
 import javaEnjoyers.modelo.excepciones.SocioNoEncontradoException;
 
 public class Controlador {
 
-    //Atributo que contiene todos los datos del sistema
-    private Datos datos;
+    // Servicios que gestionan los datos
+    private SocioService socioService;
+    private ExcursionService excursionService;
+    private InscripcionService inscripcionService;
 
     // Constructor
-    public Controlador(Datos datos) {
-        this.datos = datos;
+    public Controlador() {
+        this.socioService = new SocioService(
+                new SocioEstandarDAOImpl(),
+                new SocioFederadoDAOImpl(),
+                new SocioInfantilDAOImpl(),
+                new FederacionDAOImpl());
+        this.excursionService = new ExcursionService();
+        this.inscripcionService = new InscripcionService();
     }
-
-    // Métodos para gestionar las operaciones del usuario
 
     // 1. Agregar un socio estándar
     public void agregarSocioEstandar(String numeroSocio, String nombre, String nif, Seguro seguro) {
         SocioEstandar nuevoSocio = new SocioEstandar(numeroSocio, nombre, nif, seguro);
-        datos.agregarSocio(nuevoSocio);
+        socioService.save(nuevoSocio);
     }
 
     // 2. Agregar un socio federado
     public void agregarSocioFederado(String numeroSocio, String nombre, String nif, Federacion federacion) {
         SocioFederado nuevoSocio = new SocioFederado(numeroSocio, nombre, nif, federacion);
-        datos.agregarSocio(nuevoSocio);
+        socioService.save(nuevoSocio);
     }
 
     // 3. Agregar un socio infantil
     public void agregarSocioInfantil(String numeroSocio, String nombre, String numeroSocioAdulto) {
         SocioInfantil nuevoSocio = new SocioInfantil(numeroSocio, nombre, numeroSocioAdulto);
-        datos.agregarSocio(nuevoSocio);
+        socioService.save(nuevoSocio);
     }
 
     // 4. Agregar una excursión
     public void agregarExcursion(String codigo, String descripcion, LocalDate fecha, int numeroDias, double precio) {
         Excursion nuevaExcursion = new Excursion(codigo, descripcion, fecha, numeroDias, precio);
-        datos.agregarExcursion(nuevaExcursion);
+        excursionService.save(nuevaExcursion);
     }
 
     // 5. Inscribir a un socio en una excursión
     public void agregarInscripcion(String codigoInscripcion, String numeroSocio, String codigoExcursion) {
-        Socio socio = datos.buscarSocioPorNumero(numeroSocio);
-        Excursion excursion = datos.buscarExcursionPorCodigo(codigoExcursion);
+        Socio socio = socioService.findByNumeroSocio(numeroSocio);
+        Excursion excursion = excursionService.findByCodigo(codigoExcursion);
 
         if (socio != null && excursion != null) {
             Inscripcion nuevaInscripcion = new Inscripcion(codigoInscripcion, socio, excursion);
-            datos.agregarInscripcion(nuevaInscripcion);
+            inscripcionService.save(nuevaInscripcion);
+            socio.agregarInscripcionSocios(nuevaInscripcion);
         } else {
             System.out.println("Error: El socio o la excursión no existe.");
         }
     }
 
     // 6. Mostrar todos los socios
-    public ArrayList<Socio> mostrarSocios() {
-        return datos.getSocios();
+    public List<Socio> mostrarSocios() {
+        return socioService.findAll();
     }
 
     // 7. Mostrar todas las excursiones
-    public ArrayList<Excursion> mostrarExcursiones() {
-        return datos.getExcursiones();
+    public List<Excursion> mostrarExcursiones() {
+        return excursionService.findAll();
     }
 
     // 8. Mostrar todas las inscripciones
-    public ArrayList<Inscripcion> mostrarInscripciones() {
-        return datos.getInscripciones();
+    public List<Inscripcion> mostrarInscripciones() {
+        return inscripcionService.findAll();
     }
-
 
     // 9. Mostrar inscripciones por socio
-    public ArrayList<Inscripcion> mostrarInscripcionesPorSocio(String numeroSocio) {
-        ArrayList<Inscripcion> inscripciones = datos.getInscripciones();
-        ArrayList<Inscripcion> resultado = new ArrayList<>();
-
-        for (Inscripcion inscripcion : inscripciones) {
-            if (inscripcion.getSocio().getNumeroSocio().equals(numeroSocio)) {
-                resultado.add(inscripcion);
-            }
-        }
-        return resultado;
+    public List<Inscripcion> mostrarInscripcionesPorSocio(String numeroSocio) {
+        return inscripcionService.findByNumeroSocio(numeroSocio);
     }
 
-    // 10. Mostrar inscripciones por excursion
-    public ArrayList<Inscripcion> mostrarInscripcionesPorExcursion(String codigoExcursion) {
-        return datos.mostrarInscripcionesPorExcursion(codigoExcursion);
+    // 10. Mostrar inscripciones por excursión
+    public List<Inscripcion> mostrarInscripcionesPorExcursion(String codigoExcursion) {
+        return inscripcionService.findByExcursion(codigoExcursion);
     }
+
+    public List<Inscripcion> mostrarInscripcionesPorFecha(LocalDate fechaInicio, LocalDate fechaFin) {
+        return inscripcionService.findByFecha(fechaInicio, fechaFin);
+    }
+
 
     // 11. Eliminar socio
     public boolean eliminarSocio(String numeroSocio) {
-        Socio socio = datos.buscarSocioPorNumero(numeroSocio);
-
-        // Un socio solo puede ser eliminado si no está inscrito en ninguna excursión
-        if (socio != null && datos.buscarInscripcionesPorSocio(numeroSocio).isEmpty()) {
-            return datos.eliminarSocio(socio);
+        Socio socio = socioService.findByNumeroSocio(numeroSocio);
+        if (socio != null && inscripcionService.findByNumeroSocio(numeroSocio).isEmpty()) {
+            socioService.delete(numeroSocio);
+            return true;
         } else {
             System.out.println("No se puede eliminar el socio, está inscrito en una excursión o no existe.");
             return false;
@@ -112,16 +114,14 @@ public class Controlador {
 
     // 12. Eliminar inscripción
     public void eliminarInscripcion(String codigoInscripcion) throws InscripcionNoEliminableException {
-        Inscripcion inscripcion = datos.buscarInscripcionPorCodigo(codigoInscripcion);
+        Inscripcion inscripcion = inscripcionService.findByCodigo(codigoInscripcion);
 
         if (inscripcion != null) {
             LocalDate fechaExcursion = inscripcion.getExcursion().getFecha();
-
-            // Verificar si la fecha de la excursión ya pasó
             if (LocalDate.now().isAfter(fechaExcursion)) {
                 throw new InscripcionNoEliminableException("Error: No se puede eliminar la inscripción porque la fecha de la excursión ya pasó.");
             } else {
-                datos.eliminarInscripcion(inscripcion);
+                inscripcionService.delete(codigoInscripcion);
                 System.out.println("Inscripción eliminada correctamente.");
             }
         } else {
@@ -131,23 +131,22 @@ public class Controlador {
 
     // 13. Eliminar excursión
     public boolean eliminarExcursion(String codigoExcursion) {
-        Excursion excursion = datos.buscarExcursionPorCodigo(codigoExcursion);
-
-        // Una excursión solo se puede eliminar si no tiene inscripciones asociadas
-        if (excursion != null && datos.mostrarInscripcionesPorExcursion(codigoExcursion).isEmpty()) {
-            return datos.eliminarExcursion(excursion);
+        Excursion excursion = excursionService.findByCodigo(codigoExcursion);
+        if (excursion != null && inscripcionService.findByExcursion(codigoExcursion).isEmpty()) {
+            excursionService.delete(codigoExcursion);
+            return true;
         } else {
             System.out.println("No se puede eliminar la excursión, tiene inscripciones asociadas o no existe.");
             return false;
         }
     }
 
-    // 14. Modificar Seguro de Socio Estandar
+    // 14. Modificar Seguro de Socio Estándar
     public boolean modificarSeguroSocioEstandar(String numeroSocio, Seguro nuevoSeguro) {
-        Socio socio = datos.buscarSocioPorNumero(numeroSocio);
-
-        if (socio != null && socio instanceof SocioEstandar) {
+        Socio socio = socioService.findByNumeroSocio(numeroSocio);
+        if (socio instanceof SocioEstandar) {
             ((SocioEstandar) socio).setSeguro(nuevoSeguro);
+            socioService.update(socio);
             return true;
         } else {
             System.out.println("El socio no es estándar o no existe.");
@@ -156,91 +155,48 @@ public class Controlador {
     }
 
     // 15. Filtrar excursiones por fecha
-    public ArrayList<Excursion> filtrarExcursionesPorFecha(LocalDate fechaInicio, LocalDate fechaFin) {
-        ArrayList<Excursion> resultado = new ArrayList<>();
-
-        // Obtener todas las excursiones del sistema
-        ArrayList<Excursion> excursiones = datos.getExcursiones();
-
-        // Filtrar excursiones por rango de fechas
-        for (Excursion excursion : excursiones) {
-            LocalDate fechaExcursion = excursion.getFecha();
-            if ((fechaExcursion.isEqual(fechaInicio) || fechaExcursion.isAfter(fechaInicio)) &&
-                    (fechaExcursion.isEqual(fechaFin) || fechaExcursion.isBefore(fechaFin))) {
-                resultado.add(excursion);
-            }
-        }
-        return resultado;  // Retornar la lista de excursiones dentro del rango de fechas
+    public List<Excursion> filtrarExcursionesPorFecha(LocalDate fechaInicio, LocalDate fechaFin) {
+        return excursionService.findByFecha(fechaInicio, fechaFin);
     }
 
     // 16. Mostrar federaciones
-    public ArrayList<Federacion> mostrarFederaciones() {
-        return datos.getFederaciones(); //Metodo que devuelve las federaciones precargadas en Datos
+    public List<Federacion> mostrarFederaciones() {
+        return socioService.findAllFederaciones();
     }
 
-    // 17. Buscar socio por número
-    public Socio buscarSocioPorNumero(String numeroSocio) throws SocioNoEncontradoException {
-        Socio socio = datos.buscarSocioPorNumero(numeroSocio);
+    // 17. Calcular Factura Mensual
+    public double calcularFacturaMensual(String numeroSocio) {
+        // Encuentra al socio
+        Socio socio = socioService.findByNumeroSocio(numeroSocio);
+
+        if (socio != null) {
+            // Carga las inscripciones del socio
+            List<Inscripcion> inscripciones = inscripcionService.findByNumeroSocio(numeroSocio);
+            socio.setInscripciones(inscripciones); // Metodo que deberías tener en la clase Socio
+
+            // Calcula la cuota mensual
+            return socio.calcularCuotaMensual();
+        }
+
+        // Si no existe el socio, retorna -1
+        return -1;
+    }
+
+
+    public Socio findByNumeroSocio(String numeroSocio) throws SocioNoEncontradoException {
+        Socio socio = socioService.findByNumeroSocio(numeroSocio);
         if (socio == null) {
-            throw new SocioNoEncontradoException("Error: Socio con número " + numeroSocio + " no encontrado.");
+            throw new SocioNoEncontradoException("Socio con número " + numeroSocio + " no encontrado.");
         }
         return socio;
     }
 
-    // 18. Buscar excursión por código
-    public Excursion buscarExcursionPorCodigo(String codigoExcursion) {
-        return datos.buscarExcursionPorCodigo(codigoExcursion);
+    public Excursion buscarExcursionPorCodigo(String codigo) {
+        return excursionService.findByCodigo(codigo); // Llama al servicio correspondiente para buscar la excursión
     }
 
-    // 19. Buscar inscripción por código
     public Inscripcion buscarInscripcionPorCodigo(String codigoInscripcion) {
-        return datos.buscarInscripcionPorCodigo(codigoInscripcion);
-    }
-
-    // 20. Calcular Factura Mensual
-    public double calcularFacturaMensual(String numeroSocio) {
-        Socio socio = datos.buscarSocioPorNumero(numeroSocio);
-        if (socio == null) {
-            return -1; // Indica que el socio no existe
-        }
-        return socio.calcularCuotaMensual();  // Llama al metodo en el modelo
-    }
-
-    // 21. Agregar inscripciones de cada socio
-    public void agregarInscripcionSocios(String codigoInscripcion, String numeroSocio, String codigoExcursion) {
-        Socio socio = datos.buscarSocioPorNumero(numeroSocio);
-        Excursion excursion = datos.buscarExcursionPorCodigo(codigoExcursion);
-
-        if (socio != null && excursion != null) {
-            Inscripcion nuevaInscripcion = new Inscripcion(codigoInscripcion, socio, excursion);
-            datos.agregarInscripcion(nuevaInscripcion);  // Agregar a la lista global de inscripciones
-            socio.agregarInscripcionSocios(nuevaInscripcion);  // Agregar a la lista de inscripciones del socio
-        } else {
-            System.out.println("Error: El socio o la excursión no existe.");
-        }
-    }
-
-    // 22. Agregar nuevos socios
-    public void agregarSocio(Socio nuevoSocio) {
-        datos.agregarSocio(nuevoSocio);  // Agregar el nuevo socio a la lista de socios en Datos
-    }
-
-    // 23. Mostras inscripciones por fecha
-    public ArrayList<Inscripcion> mostrarInscripcionesPorFecha(LocalDate fechaInicio, LocalDate fechaFin) {
-        ArrayList<Inscripcion> resultado = new ArrayList<>();
-
-        // Obtener todas las inscripciones
-        ArrayList<Inscripcion> inscripciones = datos.getInscripciones();
-
-        // Filtrar por rango de fechas
-        for (Inscripcion inscripcion : inscripciones) {
-            LocalDate fechaExcursion = inscripcion.getExcursion().getFecha();
-            if ((fechaExcursion.isEqual(fechaInicio) || fechaExcursion.isAfter(fechaInicio)) &&
-                    (fechaExcursion.isEqual(fechaFin) || fechaExcursion.isBefore(fechaFin))) {
-                resultado.add(inscripcion);
-            }
-        }
-        return resultado;  // Retornar las inscripciones que están dentro del rango de fechas
+        return inscripcionService.findByCodigo(codigoInscripcion);
     }
 
 }

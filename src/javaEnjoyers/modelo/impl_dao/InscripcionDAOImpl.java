@@ -1,12 +1,9 @@
 // src/javaEnjoyers/modelo/dao/impl/InscripcionDAOImpl.java
 package javaEnjoyers.modelo.impl_dao;
 
+import javaEnjoyers.modelo.*;
 import javaEnjoyers.modelo.dao.DAOFactoryProvider;
 import javaEnjoyers.modelo.dao.InscripcionDAO;
-import javaEnjoyers.modelo.Inscripcion;
-import javaEnjoyers.modelo.Socio;
-import javaEnjoyers.modelo.Excursion;
-import javaEnjoyers.modelo.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -52,20 +49,58 @@ public class InscripcionDAOImpl implements InscripcionDAO {
     }
 
     @Override
-    public List<Inscripcion> findBySocio(String numeroSocio) {
+    public List<Inscripcion> findByNumeroSocio(String numeroSocio) {
         List<Inscripcion> inscripciones = new ArrayList<>();
-        String query = "SELECT * FROM Inscripcion WHERE numeroSocio = ?";
+        String query = "SELECT i.codigoInscripcion, i.codigoExcursion, " +
+                "e.descripcion, e.fecha, e.numeroDias, e.precioExcursion, " +
+                "s.numeroSocio, s.nombre, se.nif, se.tipoSeguro, sg.precioSeguro, " +
+                "sf.nif AS nifFederado, sf.codigoFederacion, f.nombre AS nombreFederacion, " +
+                "si.numeroSocioAdulto " +
+                "FROM inscripcion i " +
+                "JOIN excursion e ON i.codigoExcursion = e.codigoExcursion " +
+                "JOIN socio s ON i.numeroSocio = s.numeroSocio " +
+                "LEFT JOIN socioEstandar se ON s.id = se.id " +
+                "LEFT JOIN Seguro sg ON se.tipoSeguro = sg.tipoSeguro " +
+                "LEFT JOIN socioFederado sf ON s.id = sf.id " +
+                "LEFT JOIN federacion f ON sf.codigoFederacion = f.codigoFederacion " +
+                "LEFT JOIN socioInfantil si ON s.id = si.id " +
+                "WHERE i.numeroSocio = ?";
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
+
             stmt.setString(1, numeroSocio);
             ResultSet rs = stmt.executeQuery();
+
             while (rs.next()) {
+                Excursion excursion = new Excursion(
+                        rs.getString("codigoExcursion"),
+                        rs.getString("descripcion"),
+                        rs.getDate("fecha").toLocalDate(),
+                        rs.getInt("numeroDias"),
+                        rs.getDouble("precioExcursion")
+                );
+
+                Socio socio = null;
+                if (rs.getString("tipoSeguro") != null) {
+                    Seguro seguro = new Seguro(
+                            TipoSeguro.valueOf(rs.getString("tipoSeguro")),
+                            rs.getDouble("precioSeguro")
+                    );
+                    socio = new SocioEstandar(rs.getString("numeroSocio"), rs.getString("nombre"), rs.getString("nif"), seguro);
+                } else if (rs.getString("codigoFederacion") != null) {
+                    Federacion federacion = new Federacion(rs.getString("codigoFederacion"), rs.getString("nombreFederacion"));
+                    socio = new SocioFederado(rs.getString("numeroSocio"), rs.getString("nombre"), rs.getString("nifFederado"), federacion);
+                } else if (rs.getString("numeroSocioAdulto") != null) {
+                    socio = new SocioInfantil(rs.getString("numeroSocio"), rs.getString("nombre"), rs.getString("numeroSocioAdulto"));
+                }
+
                 Inscripcion inscripcion = new Inscripcion(
                         rs.getString("codigoInscripcion"),
-                        // Necesitarás métodos para obtener el socio y excursión completos por número de socio o código de excursión
-                        obtenerSocio(rs.getString("numeroSocio")),
-                        obtenerExcursion(rs.getString("codigoExcursion"))
+                        socio,
+                        excursion
                 );
+
                 inscripciones.add(inscripcion);
             }
         } catch (SQLException e) {
@@ -73,6 +108,7 @@ public class InscripcionDAOImpl implements InscripcionDAO {
         }
         return inscripciones;
     }
+
 
     @Override
     public List<Inscripcion> findByExcursion(String codigoExcursion) {
@@ -120,13 +156,18 @@ public class InscripcionDAOImpl implements InscripcionDAO {
 
     @Override
     public void save(Inscripcion inscripcion) {
-        String query = "INSERT INTO Inscripcion (codigoInscripcion, numeroSocio, codigoExcursion) VALUES (?, ?, ?)";
+        String insertInscripcion = "INSERT INTO inscripcion (codigoInscripcion, numeroSocio, codigoExcursion) VALUES (?, ?, ?)";
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(insertInscripcion)) {
+
+            // Asignar los valores
             stmt.setString(1, inscripcion.getCodigoInscripcion());
             stmt.setString(2, inscripcion.getSocio().getNumeroSocio());
             stmt.setString(3, inscripcion.getExcursion().getCodigoExcursion());
+
             stmt.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -158,8 +199,23 @@ public class InscripcionDAOImpl implements InscripcionDAO {
     }
 
     private Socio obtenerSocio(String numeroSocio) {
-        return DAOFactoryProvider.getDAOFactory().getSocioEstandarDAO().findByNumeroSocio(numeroSocio);
+        // Intentar encontrar el socio en el DAO de SocioEstandar
+        Socio socio = DAOFactoryProvider.getDAOFactory().getSocioEstandarDAO().findByNumeroSocio(numeroSocio);
+        if (socio != null) {
+            return socio;
+        }
+
+        // Intentar encontrar el socio en el DAO de SocioFederado
+        socio = DAOFactoryProvider.getDAOFactory().getSocioFederadoDAO().findByNumeroSocio(numeroSocio);
+        if (socio != null) {
+            return socio;
+        }
+
+        // Intentar encontrar el socio en el DAO de SocioInfantil
+        socio = DAOFactoryProvider.getDAOFactory().getSocioInfantilDAO().findByNumeroSocio(numeroSocio);
+        return socio; // Puede ser null si no se encuentra el socio
     }
+
 
     private Excursion obtenerExcursion(String codigoExcursion) {
         return DAOFactoryProvider.getDAOFactory().getExcursionDAO().findByCodigo(codigoExcursion);

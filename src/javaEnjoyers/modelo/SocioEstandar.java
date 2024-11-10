@@ -51,7 +51,7 @@ public class SocioEstandar extends Socio {
     //toString
     @Override
     public String toString() {
-        return "Socio Estándar: " +
+        return "----Socio Estándar: " +
                 "\nNumero socio: " + getNumeroSocio() +
                 "\nNombre: " + getNombre() +
                 "\nNIF: " + nif +
