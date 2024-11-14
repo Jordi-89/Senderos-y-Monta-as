@@ -132,19 +132,40 @@ public class InscripcionDAOImpl implements InscripcionDAO {
         return inscripciones;
     }
 
+    @Override
     public List<Inscripcion> findByFecha(LocalDate fechaInicio, LocalDate fechaFin) {
         List<Inscripcion> inscripciones = new ArrayList<>();
-        String query = "SELECT * FROM Inscripcion WHERE fecha >= ? AND fecha <= ?";
+        String query = "SELECT i.codigoInscripcion, i.numeroSocio, i.codigoExcursion, " +
+                "e.descripcion, e.fecha, e.numeroDias, e.precioExcursion " +
+                "FROM inscripcion i " +
+                "JOIN excursion e ON i.codigoExcursion = e.codigoExcursion " +
+                "WHERE e.fecha BETWEEN ? AND ?";
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setDate(1, Date.valueOf(fechaInicio));
-            stmt.setDate(2, Date.valueOf(fechaFin));
+
+            stmt.setDate(1, java.sql.Date.valueOf(fechaInicio));
+            stmt.setDate(2, java.sql.Date.valueOf(fechaFin));
+
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                // Recuperar datos de Excursion
+                Excursion excursion = new Excursion(
+                        rs.getString("codigoExcursion"),
+                        rs.getString("descripcion"),
+                        rs.getDate("fecha").toLocalDate(),
+                        rs.getInt("numeroDias"),
+                        rs.getDouble("precioExcursion")
+                );
+
+                // Recuperar socio (usando obtenerSocio)
+                Socio socio = obtenerSocio(rs.getString("numeroSocio"));
+
+                // Crear Inscripcion
                 Inscripcion inscripcion = new Inscripcion(
                         rs.getString("codigoInscripcion"),
-                        obtenerSocio(rs.getString("numeroSocio")),
-                        obtenerExcursion(rs.getString("codigoExcursion"))
+                        socio,
+                        excursion
                 );
                 inscripciones.add(inscripcion);
             }
